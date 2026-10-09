@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual da Equipe – Hangar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --card: #ffffff;
+      --text: #222;
+      --muted: #666;
+      --border: #e2e2e2;
+      --primary: #003366;
+      --accent: #ffcc00;
+      --tip-bg: #eaf3ff;
+      --tip-border: #3d7cc9;
+      --warn-bg: #fff4e0;
+      --warn-border: #e09b00;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #12161c;
+        --card: #1c222b;
+        --text: #eaeaea;
+        --muted: #a0a8b3;
+        --border: #2e3640;
+        --primary: #0b2a4a;
+        --tip-bg: #16263a;
+        --tip-border: #5b9ae6;
+        --warn-bg: #2d2412;
+        --warn-border: #e0a800;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 28px 16px 20px;
+      text-align: center;
+    }
+    header h1 { margin: 0; font-size: 1.6em; }
+    header p { margin: 4px 0 0; opacity: .85; font-size: .95em; }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--bg);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .wrap { max-width: 800px; margin: 0 auto; }
+    #busca {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 1em;
+      font-family: inherit;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--text);
+    }
+    #busca:focus { outline: none; border-color: var(--accent); }
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-top: 10px;
+      scrollbar-width: none;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex: 0 0 auto;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-family: inherit;
+      font-size: .9em;
+      cursor: pointer;
+    }
+    .chip.ativo { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 600; }
+
+    main { padding: 16px; }
+    .vazio { text-align: center; color: var(--muted); padding: 40px 0; }
+
+    .proc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      scroll-margin-top: 130px;
+    }
+    .proc summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .proc summary::-webkit-details-marker { display: none; }
+    .proc summary .icone { font-size: 1.4em; }
+    .proc summary .titulo { flex: 1; font-weight: 500; }
+    .proc summary .cat { display: block; font-size: .78em; color: var(--muted); font-weight: 400; }
+    .proc summary::after { content: '▸'; color: var(--muted); transition: transform .15s; }
+    .proc[open] summary::after { transform: rotate(90deg); }
+    .proc[open] summary { border-bottom: 1px solid var(--border); }
+
+    .corpo { padding: 14px 16px 16px; }
+    .corpo ol { margin: 0; padding-left: 22px; }
+    .corpo li { margin-bottom: 8px; }
+    .aviso, .dica {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border-left: 4px solid;
+      font-size: .92em;
+    }
+    .dica { background: var(--tip-bg); border-color: var(--tip-border); }
+    .aviso { background: var(--warn-bg); border-color: var(--warn-border); }
+    .revisar {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: .78em;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .copiar {
+      margin-top: 12px;
+      margin-left: 8px;
+      font-family: inherit;
+      font-size: .8em;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 4px;
+      padding: 2px 8px;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px 16px;
+      color: var(--muted);
+      font-size: .9em;
+    }
+    footer strong { color: var(--text); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>✈️ Manual da Equipe</h1>
+    <p>Dúvidas sobre procedimentos do restaurante? Busque aqui.</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="wrap">
+      <input id="busca" type="search" placeholder="Ex.: cancelar venda, som, KDS..." autocomplete="off">
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <div id="lista"></div>
+    <p class="vazio" id="vazio" hidden>Nenhum procedimento encontrado.<br>Pergunte ao gerente de plantão.</p>
+  </main>
+
+  <footer>
+    Não encontrou o que precisava? Fale com o <strong>gerente de plantão</strong>.<br>
+    Nunca anote senhas neste manual — peça ao gerente.
+  </footer>
+
+  <script>
+    /*
+      COMO EDITAR ESTE MANUAL
+      -----------------------
+      Cada procedimento é um item da lista PROCEDIMENTOS abaixo:
+        id        identificador único, sem espaços (usado no link direto: procedimentos.html#id)
+        categoria uma das chaves de CATEGORIAS
+        titulo    pergunta como o funcionário faria
+        palavras  termos extras para a busca
+        passos    lista de passos, em ordem
+        dica      (opcional) texto em caixa azul
+        aviso     (opcional) texto em caixa laranja
+        revisar   (opcional) true mostra "conferir passos" — remova depois de validar no restaurante
+      Não coloque senhas aqui.
+    */
+    const CATEGORIAS = {
+      saipos:  { nome: 'Saipos',             icone: '💳' },
+      bar:     { nome: 'Bar',                icone: '🍹' },
+      cozinha: { nome: 'Cozinha',            icone: '👨‍🍳' },
+      salao:   { nome: 'Salão',              icone: '🔊' },
+      rotina:  { nome: 'Abertura/Fechamento', icone: '🔑' }
+    };
+
+    const PROCEDIMENTOS = [
+      {
+        id: 'cancelar-venda-saipos',
+        categoria: 'saipos',
+        titulo: 'Como cancelar uma venda na Saipos',
+        palavras: 'estornar estorno excluir pedido apagar venda errada',
+        passos: [
+          'No menu lateral da Saipos, abra <b>Vendas</b>.',
+          'Localize a venda pelo número, mesa ou horário.',
+          'Clique na venda para abrir os detalhes.',
+          'Clique em <b>Cancelar venda</b>.',
+          'Selecione o <b>motivo do cancelamento</b> e confirme.',
+          'Se pedir, o gerente digita a senha de autorização.'
+        ],
+        aviso: 'Venda paga no cartão: o estorno precisa ser feito também na maquininha. Chame o gerente.',
+        revisar: true
+      },
+      {
+        id: 'cadastrar-cliente-saipos',
+        categoria: 'saipos',
+        titulo: 'Como cadastrar um cliente na Saipos',
+        palavras: 'novo cliente telefone cpf delivery cadastro',
+        passos: [
+          'Ao abrir uma venda, clique no campo <b>Cliente</b>.',
+          'Digite o <b>telefone</b> do cliente — se já tiver cadastro, ele aparece.',
+          'Se não aparecer, clique em <b>Novo cliente</b>.',
+          'Preencha nome, telefone e, se for entrega, o endereço completo.',
+          'Clique em <b>Salvar</b>. O cliente fica vinculado à venda.'
+        ],
+        dica: 'Sempre confirme o telefone em voz alta com o cliente antes de salvar.',
+        revisar: true
+      },
+      {
+        id: 'abrir-caixa-saipos',
+        categoria: 'saipos',
+        titulo: 'Como abrir o caixa na Saipos',
+        palavras: 'iniciar caixa fundo de troco turno',
+        passos: [
+          'Faça login na Saipos com seu usuário.',
+          'Clique em <b>Caixa</b> › <b>Abrir caixa</b>.',
+          'Informe o valor do <b>fundo de troco</b> que está na gaveta.',
+          'Confirme. Só é possível lançar vendas com o caixa aberto.'
+        ],
+        revisar: true
+      },
+      {
+        id: 'fechar-caixa-saipos',
+        categoria: 'saipos',
+        titulo: 'Como fechar o caixa na Saipos',
+        palavras: 'encerrar caixa fim do turno conferência sangria',
+        passos: [
+          'Confira se não há mesas ou comandas abertas.',
+          'Clique em <b>Caixa</b> › <b>Fechar caixa</b>.',
+          'Conte o dinheiro da gaveta e informe os valores de cada forma de pagamento.',
+          'Confirme e imprima o relatório de fechamento.',
+          'Entregue o relatório e o dinheiro ao gerente.'
+        ],
+        aviso: 'Se houver diferença de valores, não feche sozinho — chame o gerente.',
+        revisar: true
+      },
+      {
+        id: 'login-bar',
+        categoria: 'bar',
+        titulo: 'Como fazer login no sistema do bar',
+        palavras: 'entrar acessar senha usuário tablet bar',
+        passos: [
+          'Ligue o tablet/computador do bar (botão lateral / botão de energia).',
+          'Abra o aplicativo do sistema do bar.',
+          'Digite seu <b>usuário</b> e <b>senha</b> pessoais.',
+          'Confira se aparecem os pedidos do bar na tela.'
+        ],
+        dica: 'Esqueceu a senha? Peça ao gerente para redefinir. Não use o login de outra pessoa.',
+        revisar: true
+      },
+      {
+        id: 'login-kds',
+        categoria: 'cozinha',
+        titulo: 'Como fazer login no KDS da cozinha',
+        palavras: 'tela cozinha monitor pedidos kds entrar acessar',
+        passos: [
+          'Ligue a tela do KDS e aguarde carregar.',
+          'Abra o aplicativo/navegador do KDS.',
+          'Faça login com o usuário da cozinha.',
+          'Selecione a <b>estação</b> correta (ex.: cozinha, chapa, sobremesas).',
+          'Confira se os pedidos abertos aparecem na tela.'
+        ],
+        aviso: 'Se os pedidos não aparecerem, verifique a internet/Wi-Fi e avise o gerente imediatamente.',
+        revisar: true
+      },
+      {
+        id: 'ligar-som-salao',
+        categoria: 'salao',
+        titulo: 'Como ligar o som do salão',
+        palavras: 'música caixa de som amplificador volume playlist spotify',
+        passos: [
+          'Ligue o <b>amplificador</b> (local: ________).',
+          'Conecte o celular/computador da casa via Bluetooth ou cabo.',
+          'Abra a playlist do restaurante.',
+          'Ajuste o volume: comece baixo e aumente aos poucos.'
+        ],
+        dica: 'Volume ideal: dá para conversar na mesa sem precisar levantar a voz.',
+        revisar: true
+      },
+      {
+        id: 'desligar-som-salao',
+        categoria: 'rotina',
+        titulo: 'Como desligar o som no fechamento',
+        palavras: 'fechar desligar música amplificador',
+        passos: [
+          'Baixe o volume até o mínimo.',
+          'Pause a música no aparelho.',
+          'Desligue o <b>amplificador</b>.'
+        ],
+        dica: 'Desligar com o volume no mínimo evita estalo nas caixas.',
+        revisar: true
+      }
+    ];
+
+    // ----- daqui para baixo não precisa editar -----
+
+    const lista = document.getElementById('lista');
+    const vazio = document.getElementById('vazio');
+    const busca = document.getElementById('busca');
+    const chips = document.getElementById('chips');
+    let categoriaAtiva = 'todas';
+
+    const normalizar = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    const textoSemTags = s => s.replace(/<[^>]+>/g, '');
+
+    function renderChips() {
+      const opcoes = [['todas', { nome: 'Todas', icone: '' }], ...Object.entries(CATEGORIAS)];
+      chips.innerHTML = opcoes.map(([chave, c]) =>
+        `<button class="chip${chave === categoriaAtiva ? ' ativo' : ''}" data-cat="${chave}">${c.icone} ${c.nome}</button>`
+      ).join('');
+    }
+
+    function renderLista() {
+      lista.innerHTML = PROCEDIMENTOS.map(p => {
+        const c = CATEGORIAS[p.categoria];
+        return `
+          <details class="proc" id="${p.id}" data-cat="${p.categoria}"
+                   data-busca="${normalizar([p.titulo, p.palavras || '', c.nome, ...p.passos.map(textoSemTags)].join(' '))}">
+            <summary>
+              <span class="icone">${c.icone}</span>
+              <span class="titulo">${p.titulo}<span class="cat">${c.nome}</span></span>
+            </summary>
+            <div class="corpo">
+              <ol>${p.passos.map(s => `<li>${s}</li>`).join('')}</ol>
+              ${p.dica ? `<div class="dica">💡 ${p.dica}</div>` : ''}
+              ${p.aviso ? `<div class="aviso">⚠️ ${p.aviso}</div>` : ''}
+              ${p.revisar ? '<span class="revisar">conferir passos</span>' : ''}
+              <button class="copiar" data-id="${p.id}">🔗 copiar link</button>
+            </div>
+          </details>`;
+      }).join('');
+    }
+
+    function filtrar() {
+      const termos = normalizar(busca.value).split(/\s+/).filter(Boolean);
+      let visiveis = 0;
+      lista.querySelectorAll('.proc').forEach(el => {
+        const ok = (categoriaAtiva === 'todas' || el.dataset.cat === categoriaAtiva)
+          && termos.every(t => el.dataset.busca.includes(t));
+        el.hidden = !ok;
+        if (ok) visiveis++;
+      });
+      vazio.hidden = visiveis > 0;
+    }
+
+    chips.addEventListener('click', e => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      categoriaAtiva = btn.dataset.cat;
+      renderChips();
+      filtrar();
+    });
+
+    busca.addEventListener('input', filtrar);
+
+    lista.addEventListener('click', e => {
+      const btn = e.target.closest('.copiar');
+      if (!btn) return;
+      const url = location.href.split('#')[0] + '#' + btn.dataset.id;
+      navigator.clipboard?.writeText(url).then(
+        () => { btn.textContent = '✅ link copiado'; setTimeout(() => btn.textContent = '🔗 copiar link', 2000); },
+        () => prompt('Copie o link:', url)
+      ) ?? prompt('Copie o link:', url);
+    });
+
+    function abrirPorHash() {
+      const el = location.hash && document.getElementById(location.hash.slice(1));
+      if (el && el.classList.contains('proc')) {
+        el.open = true;
+        el.scrollIntoView({ block: 'start' });
+      }
+    }
+    window.addEventListener('hashchange', abrirPorHash);
+
+    renderChips();
+    renderLista();
+    filtrar();
+    abrirPorHash();
+  </script>
+</body>
+</html>
