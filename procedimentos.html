@@ -121,6 +121,38 @@
     .corpo { padding: 14px 16px 16px; }
     .corpo ol { margin: 0; padding-left: 22px; }
     .corpo li { margin-bottom: 8px; }
+    .corpo li img {
+      display: block;
+      max-width: 100%;
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: zoom-in;
+    }
+    .botao-link {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 16px;
+      background: var(--accent);
+      color: #000;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: .92em;
+    }
+    #zoom {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      cursor: zoom-out;
+    }
+    #zoom[hidden] { display: none; }
+    #zoom img { max-width: 100%; max-height: 100%; border-radius: 8px; }
     .aviso, .dica {
       margin-top: 12px;
       padding: 10px 12px;
@@ -179,6 +211,8 @@
     <p class="vazio" id="vazio" hidden>Nenhum procedimento encontrado.<br>Pergunte ao gerente de plantão.</p>
   </main>
 
+  <div id="zoom" hidden><img alt=""></div>
+
   <footer>
     Não encontrou o que precisava? Fale com o <strong>gerente de plantão</strong>.<br>
     Nunca anote senhas neste manual — peça ao gerente.
@@ -193,7 +227,10 @@
         categoria uma das chaves de CATEGORIAS
         titulo    pergunta como o funcionário faria
         palavras  termos extras para a busca
-        passos    lista de passos, em ordem
+        passos    lista de passos, em ordem. Para um passo com imagem, use
+                  { texto: 'Clique no botão...', img: 'img/nome-da-imagem.png' }
+                  (as imagens ficam na pasta img/)
+        link      (opcional) { texto: 'Abrir site', url: 'https://...' } mostra um botão
         dica      (opcional) texto em caixa azul
         aviso     (opcional) texto em caixa laranja
         revisar   (opcional) true mostra "conferir passos" — remova depois de validar no restaurante
@@ -238,6 +275,21 @@
         ],
         dica: 'Sempre confirme o telefone em voz alta com o cliente antes de salvar.',
         revisar: true
+      },
+      {
+        id: 'chamado-saipos',
+        categoria: 'saipos',
+        titulo: 'Como abrir um chamado na Saipos (suporte)',
+        palavras: 'suporte ajuda problema erro chat atendimento chamado contato',
+        passos: [
+          { texto: 'Na tela da Saipos, clique no <b>botão azul do chat</b>, no canto inferior direito.', img: 'img/saipos-botao-chat.png' },
+          'Clique em <b>Enviar mensagem</b>.',
+          'Explique o problema: o que você estava fazendo, o que apareceu na tela e o número da venda/mesa, se houver.',
+          'Se possível, envie um print da tela com o erro.',
+          'Aguarde a resposta no próprio chat — não feche a Saipos.'
+        ],
+        dica: 'Antes de abrir o chamado, procure a dúvida na Central de Ajuda da Saipos — muitas respostas já estão lá.',
+        link: { texto: '📖 Abrir Central de Ajuda Saipos', url: 'https://intercom.help/meajuda-saipos/pt-BR/' }
       },
       {
         id: 'abrir-caixa-saipos',
@@ -348,13 +400,17 @@
         const c = CATEGORIAS[p.categoria];
         return `
           <details class="proc" id="${p.id}" data-cat="${p.categoria}"
-                   data-busca="${normalizar([p.titulo, p.palavras || '', c.nome, ...p.passos.map(textoSemTags)].join(' '))}">
+                   data-busca="${normalizar([p.titulo, p.palavras || '', c.nome, ...p.passos.map(s => textoSemTags(typeof s === 'string' ? s : s.texto))].join(' '))}">
             <summary>
               <span class="icone">${c.icone}</span>
               <span class="titulo">${p.titulo}<span class="cat">${c.nome}</span></span>
             </summary>
             <div class="corpo">
-              <ol>${p.passos.map(s => `<li>${s}</li>`).join('')}</ol>
+              <ol>${p.passos.map(s => typeof s === 'string'
+                ? `<li>${s}</li>`
+                : `<li>${s.texto}${s.img ? `<img src="${s.img}" alt="" loading="lazy">` : ''}</li>`
+              ).join('')}</ol>
+              ${p.link ? `<a class="botao-link" href="${p.link.url}" target="_blank" rel="noopener">${p.link.texto}</a><br>` : ''}
               ${p.dica ? `<div class="dica">💡 ${p.dica}</div>` : ''}
               ${p.aviso ? `<div class="aviso">⚠️ ${p.aviso}</div>` : ''}
               ${p.revisar ? '<span class="revisar">conferir passos</span>' : ''}
@@ -395,6 +451,15 @@
         () => prompt('Copie o link:', url)
       ) ?? prompt('Copie o link:', url);
     });
+
+    const zoom = document.getElementById('zoom');
+    lista.addEventListener('click', e => {
+      if (e.target.matches('.corpo li img')) {
+        zoom.querySelector('img').src = e.target.src;
+        zoom.hidden = false;
+      }
+    });
+    zoom.addEventListener('click', () => zoom.hidden = true);
 
     function abrirPorHash() {
       const el = location.hash && document.getElementById(location.hash.slice(1));
