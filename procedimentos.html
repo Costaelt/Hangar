@@ -145,7 +145,7 @@
     }
     .botao-link {
       display: inline-block;
-      margin-top: 12px;
+      margin-bottom: 14px;
       padding: 10px 16px;
       background: var(--accent);
       color: #000;
@@ -429,11 +429,11 @@
               <span class="titulo">${p.titulo}<span class="cat">${c.nome}</span></span>
             </summary>
             <div class="corpo">
+              ${p.link ? `<a class="botao-link" href="${p.link.url}" target="_blank" rel="noopener">${p.link.texto}</a>` : ''}
               <ol>${p.passos.map(s => typeof s === 'string'
                 ? `<li>${s}</li>`
                 : `<li>${s.texto}${s.img ? `<img src="${IMAGENS_EMBUTIDAS[s.img] || s.img}" alt="Imagem do passo" loading="lazy">` : ''}</li>`
               ).join('')}</ol>
-              ${p.link ? `<a class="botao-link" href="${p.link.url}" target="_blank" rel="noopener">${p.link.texto}</a><br>` : ''}
               ${p.dica ? `<div class="dica">💡 ${p.dica}</div>` : ''}
               ${p.aviso ? `<div class="aviso">⚠️ ${p.aviso}</div>` : ''}
               ${p.revisar ? '<span class="revisar">conferir passos</span>' : ''}
