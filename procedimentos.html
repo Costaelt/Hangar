@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manual da Equipe – Hangar</title>
+  <title>Manual da Equipe Hangar</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -20,7 +20,7 @@
       --warn-border: #e09b00;
     }
     @media (prefers-color-scheme: dark) {
-      :root {
+      :root:not([data-theme="light"]) {
         --bg: #12161c;
         --card: #1c222b;
         --text: #eaeaea;
@@ -31,7 +31,21 @@
         --tip-border: #5b9ae6;
         --warn-bg: #2d2412;
         --warn-border: #e0a800;
+        color-scheme: dark;
       }
+    }
+    :root[data-theme="dark"] {
+      --bg: #12161c;
+      --card: #1c222b;
+      --text: #eaeaea;
+      --muted: #a0a8b3;
+      --border: #2e3640;
+      --primary: #0b2a4a;
+      --tip-bg: #16263a;
+      --tip-border: #5b9ae6;
+      --warn-bg: #2d2412;
+      --warn-border: #e0a800;
+      color-scheme: dark;
     }
     * { box-sizing: border-box; }
     body {
@@ -52,7 +66,7 @@
 
     .toolbar {
       position: sticky;
-      top: 0;
+      top: env(safe-area-inset-top, 0px);
       z-index: 10;
       background: var(--bg);
       padding: 12px 16px;
@@ -455,10 +469,9 @@
       const btn = e.target.closest('.copiar');
       if (!btn) return;
       const url = location.href.split('#')[0] + '#' + btn.dataset.id;
-      navigator.clipboard?.writeText(url).then(
-        () => { btn.textContent = '✅ link copiado'; setTimeout(() => btn.textContent = '🔗 copiar link', 2000); },
-        () => prompt('Copie o link:', url)
-      ) ?? prompt('Copie o link:', url);
+      const mostrar = t => { btn.textContent = t; setTimeout(() => btn.textContent = '🔗 copiar link', 2500); };
+      Promise.resolve(navigator.clipboard?.writeText(url) ?? Promise.reject())
+        .then(() => mostrar('✅ link copiado'), () => mostrar(url));
     });
 
     const zoom = document.getElementById('zoom');
