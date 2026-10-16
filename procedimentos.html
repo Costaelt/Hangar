@@ -266,6 +266,7 @@
     const CATEGORIAS = {
       saipos:  { nome: 'Saipos',             icone: '💳' },
       h41club: { nome: 'H41 Club',           icone: '💰' },
+      descontos: { nome: 'Descontos',        icone: '🏷️' },
       bar:     { nome: 'Bar',                icone: '🍹' },
       cozinha: { nome: 'Cozinha',            icone: '👨‍🍳' },
       salao:   { nome: 'Salão',              icone: '🔊' },
@@ -314,6 +315,33 @@
           }
         ],
         dica: '<b>Esqueceu de escrever “cashback” ou de identificar o cliente?</b><br>Avise o responsável com o número da venda e o nome do cliente. O débito é lançado manualmente no painel, e o saldo fica correto para a próxima visita.'
+      },
+      {
+        id: 'desconto-buffet-10',
+        categoria: 'descontos',
+        titulo: 'Desconto de 10% no buffet: regras',
+        palavras: 'desconto 10 por cento buffet hangar aeroporto aeroclube flex solojet piloto funcionario cracha carteirinha',
+        resumo: 'Desconto de 10% no buffet para quem trabalha nos hangares de dentro do aeroporto.',
+        passos: [
+          'Pergunte ao cliente em qual empresa do aeroporto ele trabalha.',
+          '<b>Na dúvida, peça a identificação da empresa</b> (crachá, carteirinha etc.).',
+          'Se ele trabalha em um hangar ou empresa de dentro do aeroporto, aplique o desconto de 10% no buffet.'
+        ],
+        secoes: [
+          {
+            titulo: '✅ Quem tem direito',
+            itens: [
+              'Funcionários dos hangares de dentro do aeroporto: <b>Aeroclube</b>, <b>Flex</b>, <b>Solojet</b> etc.',
+              '<b>Pilotos</b> que são funcionários de alguma dessas empresas de dentro do aeroporto.'
+            ]
+          },
+          {
+            titulo: '❌ Quem não tem direito',
+            itens: [
+              '<b>Pilotos que não são funcionários</b> de empresas de dentro do aeroporto.'
+            ]
+          }
+        ]
       }
     ];
 
