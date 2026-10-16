@@ -168,6 +168,14 @@
     #zoom[hidden] { display: none; }
     #zoom img { max-width: 100%; max-height: 100%; border-radius: 8px; }
     .resumo { margin: 0 0 12px; color: var(--muted); }
+    .regras {
+      margin: 0 0 16px;
+      padding: 12px 14px;
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+    }
+    .regras h3, .passo-titulo { margin: 0 0 8px; font-size: 1em; }
+    .regras ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
     .secao h3 { margin: 16px 0 6px; font-size: 1em; }
     .secao ul { margin: 0; padding-left: 20px; }
     .secao li { margin-bottom: 6px; }
@@ -256,6 +264,7 @@
                   (as imagens ficam na pasta img/)
         link      (opcional) { texto: 'Abrir site', url: 'https://...' } mostra um botão
         resumo    (opcional) frase curta mostrada antes dos passos
+        regras    (opcional) lista de regras em destaque, antes do passo a passo
         secoes    (opcional) blocos depois dos passos: [{ titulo: '...', itens: ['...', '...'] }]
                   ou [{ titulo: '...', texto: '...' }]
         dica      (opcional) texto em caixa azul
@@ -321,36 +330,20 @@
         categoria: 'descontos',
         titulo: 'Desconto de 10% no buffet: regras',
         palavras: 'identificar cliente cadastro desconto 10 por cento buffet almoço hangar aeroporto aeroclube flex solojet piloto funcionario cracha carteirinha a la carte bebida sobremesa',
-        resumo: 'Desconto de 10% <b>só no almoço buffet</b>, para quem trabalha nos hangares de dentro do aeroporto.',
+        resumo: 'Desconto de 10% para quem trabalha no aeroporto, só no almoço buffet.',
+        regras: [
+          '✅ <b>Tem direito:</b> funcionários dos hangares e empresas de dentro do aeroporto (Aeroclube, Flex, Solojet etc.).',
+          '✈️ <b>Pilotos:</b> só têm direito se forem funcionários de uma dessas empresas. Piloto que não é funcionário <b>não tem desconto</b>.',
+          '🍽️ <b>Vale só para o almoço buffet.</b> À la carte, bebidas, sobremesas e outros itens <b>não têm desconto</b>.',
+          '🪪 <b>Identificar o cliente na Saipos é obrigatório.</b> Sem identificação, não tem desconto.'
+        ],
         passos: [
           'Pergunte ao cliente em qual empresa do aeroporto ele trabalha.',
           '<b>Na dúvida, peça a identificação da empresa</b> (crachá, carteirinha etc.).',
-          '<b>Identifique o cliente na venda da Saipos (obrigatório).</b><br>Sem cliente identificado, não tem desconto.',
-          'Se ele trabalha em um hangar ou empresa de dentro do aeroporto, aplique o desconto de 10% <b>somente no valor do almoço buffet</b>.'
+          '<b>Identifique o cliente na venda da Saipos.</b>',
+          'Aplique o desconto de 10% <b>somente no valor do almoço buffet</b>.'
         ],
-        dica: 'Se o cliente não quiser se identificar, explique: <b>a troca é justa — o restaurante dá o desconto e, em troca, o cliente se identifica.</b>',
-        secoes: [
-          {
-            titulo: '✅ Quem tem direito',
-            itens: [
-              'Funcionários dos hangares de dentro do aeroporto: <b>Aeroclube</b>, <b>Flex</b>, <b>Solojet</b> etc.',
-              '<b>Pilotos</b> que são funcionários de alguma dessas empresas de dentro do aeroporto.'
-            ]
-          },
-          {
-            titulo: '❌ Quem não tem direito',
-            itens: [
-              '<b>Pilotos que não são funcionários</b> de empresas de dentro do aeroporto.'
-            ]
-          },
-          {
-            titulo: '🍽️ O que tem desconto',
-            itens: [
-              '<b>Vale:</b> só o <b>almoço buffet</b>.',
-              '<b>Não vale:</b> à la carte, bebidas, sobremesas e qualquer outro item da conta.'
-            ]
-          }
-        ]
+        dica: 'Se o cliente não quiser se identificar, explique: <b>a troca é justa — o restaurante dá o desconto e, em troca, o cliente se identifica.</b>'
       }
     ];
 
@@ -386,7 +379,7 @@
         return `
           <details class="proc" id="${p.id}" data-cat="${p.categoria}"
                    data-busca="${normalizar([p.titulo, p.palavras || '', c.nome, ...p.passos.map(s => textoSemTags(typeof s === 'string' ? s : s.texto)),
-                     textoSemTags(p.resumo || ''), ...(p.secoes || []).map(sec => textoSemTags([sec.titulo, sec.texto || '', ...(sec.itens || [])].join(' ')))].join(' '))}">
+                     textoSemTags(p.resumo || ''), ...(p.regras || []).map(textoSemTags), ...(p.secoes || []).map(sec => textoSemTags([sec.titulo, sec.texto || '', ...(sec.itens || [])].join(' ')))].join(' '))}">
             <summary>
               <span class="icone">${c.icone}</span>
               <span class="titulo">${p.titulo}<span class="cat">${c.nome}</span></span>
@@ -394,6 +387,8 @@
             <div class="corpo">
               ${p.link ? `<a class="botao-link" href="${p.link.url}" target="_blank" rel="noopener">${p.link.texto}</a>` : ''}
               ${p.resumo ? `<p class="resumo">${p.resumo}</p>` : ''}
+              ${p.regras ? `<div class="regras"><h3>📋 Regras</h3><ul>${p.regras.map(r => `<li>${r}</li>`).join('')}</ul></div>
+                <h3 class="passo-titulo">Passo a passo</h3>` : ''}
               <ol>${p.passos.map(s => typeof s === 'string'
                 ? `<li>${s}</li>`
                 : `<li>${s.texto}${s.img ? `<img src="${IMAGENS_EMBUTIDAS[s.img] || s.img}" alt="Imagem do passo" loading="lazy">` : ''}</li>`
