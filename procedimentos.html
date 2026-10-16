@@ -167,6 +167,16 @@
     }
     #zoom[hidden] { display: none; }
     #zoom img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+    .resumo { margin: 0 0 12px; color: var(--muted); }
+    .secao h3 { margin: 16px 0 6px; font-size: 1em; }
+    .secao ul { margin: 0; padding-left: 20px; }
+    .secao li { margin-bottom: 6px; }
+    .corpo code {
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: var(--tip-bg);
+      font-weight: 600;
+    }
     .aviso, .dica {
       margin-top: 12px;
       padding: 10px 12px;
@@ -215,7 +225,7 @@
 
   <div class="toolbar">
     <div class="wrap">
-      <input id="busca" type="search" placeholder="O que você precisa? Ex.: chamado, suporte..." autocomplete="off">
+      <input id="busca" type="search" placeholder="O que você precisa? Ex.: cashback, chamado..." autocomplete="off">
       <div class="chips" id="chips"></div>
     </div>
   </div>
@@ -245,6 +255,9 @@
                   { texto: 'Clique no botão...', img: 'img/nome-da-imagem.png' }
                   (as imagens ficam na pasta img/)
         link      (opcional) { texto: 'Abrir site', url: 'https://...' } mostra um botão
+        resumo    (opcional) frase curta mostrada antes dos passos
+        secoes    (opcional) blocos depois dos passos: [{ titulo: '...', itens: ['...', '...'] }]
+                  ou [{ titulo: '...', texto: '...' }]
         dica      (opcional) texto em caixa azul
         aviso     (opcional) texto em caixa laranja
         revisar   (opcional) true mostra "conferir passos" — remova depois de validar no restaurante
@@ -252,6 +265,7 @@
     */
     const CATEGORIAS = {
       saipos:  { nome: 'Saipos',             icone: '💳' },
+      h41club: { nome: 'H41 Club',           icone: '💰' },
       bar:     { nome: 'Bar',                icone: '🍹' },
       cozinha: { nome: 'Cozinha',            icone: '👨‍🍳' },
       salao:   { nome: 'Salão',              icone: '🔊' },
@@ -275,6 +289,31 @@
         ],
         dica: 'Antes de abrir o chamado, procure a dúvida na Central de Ajuda da Saipos — muitas respostas já estão lá. Depois de abrir, avise o responsável e passe o número do protocolo.',
         link: { texto: '📖 Abrir Central de Ajuda Saipos', url: 'https://intercom.help/meajuda-saipos/pt-BR/' }
+      },
+      {
+        id: 'cashback-h41club',
+        categoria: 'h41club',
+        titulo: 'Desconto com cashback do H41 Club',
+        palavras: 'cashback saldo desconto clube fidelidade h41 club debitar resgatar usar saldo',
+        resumo: 'Use sempre que o cliente pedir para gastar o saldo de cashback na conta.',
+        passos: [
+          '<b>Confira o saldo do cliente.</b><br>Veja o saldo no painel do H41 Club ou peça para o cliente mostrar no portal dele. O desconto não pode passar do saldo.',
+          '<b>Identifique o cliente na venda.</b><br>Vincule o cadastro (telefone/nome) à comanda na Saipos antes de fechar. Sem cliente identificado o sistema não sabe de quem debitar.',
+          '<b>Aplique o desconto manual.</b><br>No campo de desconto manual da Saipos, lance o valor em R$. Limite: <b>30% do valor da conta</b> e nunca mais que o saldo.',
+          '<b>Escreva <code>CASHBACK</code> no motivo do desconto.</b><br>É essa palavra que faz o sistema debitar o saldo. Pode ser maiúscula ou minúscula, sozinha ou numa frase (ex.: “cashback cliente”).',
+          '<b>Feche a venda normalmente.</b><br>O débito acontece sozinho em até 1 hora. Não precisa lançar nada no painel do H41 Club.'
+        ],
+        secoes: [
+          {
+            titulo: '⚠️ Atenção',
+            itens: [
+              '<b>Outros descontos não levam a palavra “cashback”.</b> Cortesia, consumo próprio, erro de cozinha, parceria e cupom: escreva só o motivo real.',
+              '<b>Evite lançar desconto manual de exatamente 30% que não seja cashback.</b> O sistema entende 30% exato como cashback e debita o saldo do cliente, se ele tiver.',
+              '<b>Cupons</b> (10%, 15%, 20%, 25%) não debitam cashback. Use o campo de cupom da Saipos para eles.'
+            ]
+          }
+        ],
+        dica: '<b>Esqueceu de escrever “cashback” ou de identificar o cliente?</b><br>Avise a gerência com o número da venda e o nome do cliente. O débito é lançado manualmente no painel, e o saldo fica correto para a próxima visita.'
       }
     ];
 
@@ -309,17 +348,24 @@
         const c = CATEGORIAS[p.categoria];
         return `
           <details class="proc" id="${p.id}" data-cat="${p.categoria}"
-                   data-busca="${normalizar([p.titulo, p.palavras || '', c.nome, ...p.passos.map(s => textoSemTags(typeof s === 'string' ? s : s.texto))].join(' '))}">
+                   data-busca="${normalizar([p.titulo, p.palavras || '', c.nome, ...p.passos.map(s => textoSemTags(typeof s === 'string' ? s : s.texto)),
+                     textoSemTags(p.resumo || ''), ...(p.secoes || []).map(sec => textoSemTags([sec.titulo, sec.texto || '', ...(sec.itens || [])].join(' ')))].join(' '))}">
             <summary>
               <span class="icone">${c.icone}</span>
               <span class="titulo">${p.titulo}<span class="cat">${c.nome}</span></span>
             </summary>
             <div class="corpo">
               ${p.link ? `<a class="botao-link" href="${p.link.url}" target="_blank" rel="noopener">${p.link.texto}</a>` : ''}
+              ${p.resumo ? `<p class="resumo">${p.resumo}</p>` : ''}
               <ol>${p.passos.map(s => typeof s === 'string'
                 ? `<li>${s}</li>`
                 : `<li>${s.texto}${s.img ? `<img src="${IMAGENS_EMBUTIDAS[s.img] || s.img}" alt="Imagem do passo" loading="lazy">` : ''}</li>`
               ).join('')}</ol>
+              ${(p.secoes || []).map(sec => `
+                <div class="secao">
+                  <h3>${sec.titulo}</h3>
+                  ${sec.itens ? `<ul>${sec.itens.map(i => `<li>${i}</li>`).join('')}</ul>` : `<p>${sec.texto}</p>`}
+                </div>`).join('')}
               ${p.dica ? `<div class="dica">💡 ${p.dica}</div>` : ''}
               ${p.aviso ? `<div class="aviso">⚠️ ${p.aviso}</div>` : ''}
               ${p.revisar ? '<span class="revisar">conferir passos</span>' : ''}
