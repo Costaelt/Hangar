@@ -276,7 +276,7 @@
       saipos:  { nome: 'Saipos',             icone: '💳' },
       h41club: { nome: 'H41 Club',           icone: '💰' },
       descontos: { nome: 'Descontos',        icone: '🏷️' },
-      marmitas: { nome: 'Marmitas',          icone: '🍱' },
+      fornecimento: { nome: 'Fornecimento',  icone: '📦' },
       bar:     { nome: 'Bar',                icone: '🍹' },
       cozinha: { nome: 'Cozinha',            icone: '👨‍🍳' },
       salao:   { nome: 'Salão',              icone: '🔊' },
@@ -352,7 +352,7 @@
       },
       {
         id: 'marmitas-acoi-afrv-veeone',
-        categoria: 'marmitas',
+        categoria: 'fornecimento',
         titulo: 'Fornecimento de marmitas: ACOI / AFRV / VEE ONE',
         palavras: 'fiado conta pendura marmita marmitex quentinha fornecimento acoi afrv vee one veeone desconto 100 cortesia empresa convenio',
         resumo: 'Regras gerais para as marmitas que o restaurante fornece às empresas ACOI, AFRV e VEE ONE.',
@@ -368,6 +368,27 @@
           'Identifique como cliente da venda o <b>cadastro da empresa</b> que pediu: ACOI, AFRV ou VEE ONE.',
           'Aplique o <b>desconto de 100%</b>.',
           'Feche a venda como <b>fiado</b>, lançando na conta cadastrada da empresa.'
+        ]
+      },
+      {
+        id: 'fornecimento-aeroclube',
+        categoria: 'fornecimento',
+        titulo: 'Fornecimento de itens para o Aeroclube',
+        palavras: 'aeroclube fornecimento itens fiado conta desconto 100 assinatura caderno assinar',
+        resumo: 'Regras para qualquer item que o restaurante fornece ao Aeroclube.',
+        regras: [
+          '🧾 <b>Todo item fornecido ao Aeroclube é lançado no sistema.</b> Nenhum item sai sem lançamento.',
+          '💯 <b>Desconto de 100%</b> em todos os itens.',
+          '📒 <b>Feche a venda como fiado</b>, lançando na conta do Aeroclube.',
+          '✍️ <b>Coletar a assinatura no caderno é obrigatório.</b>',
+          '🚫 <b>Não escreva “cashback” no motivo do desconto.</b> Escreva só o motivo real (ex.: “fornecimento Aeroclube”).'
+        ],
+        passos: [
+          'Abra uma venda na Saipos e lance todos os itens fornecidos.',
+          'Identifique como cliente da venda o <b>cadastro do Aeroclube</b>.',
+          'Aplique o <b>desconto de 100%</b>.',
+          'Feche a venda como <b>fiado</b>, lançando na conta do Aeroclube.',
+          'Colete a <b>assinatura no caderno</b>.'
         ]
       }
     ];
