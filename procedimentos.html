@@ -215,7 +215,7 @@
 
   <div class="toolbar">
     <div class="wrap">
-      <input id="busca" type="search" placeholder="Ex.: cancelar venda, som, KDS..." autocomplete="off">
+      <input id="busca" type="search" placeholder="O que você precisa? Ex.: chamado, suporte..." autocomplete="off">
       <div class="chips" id="chips"></div>
     </div>
   </div>
@@ -260,37 +260,6 @@
 
     const PROCEDIMENTOS = [
       {
-        id: 'cancelar-venda-saipos',
-        categoria: 'saipos',
-        titulo: 'Como cancelar uma venda na Saipos',
-        palavras: 'estornar estorno excluir pedido apagar venda errada',
-        passos: [
-          'No menu lateral da Saipos, abra <b>Vendas</b>.',
-          'Localize a venda pelo número, mesa ou horário.',
-          'Clique na venda para abrir os detalhes.',
-          'Clique em <b>Cancelar venda</b>.',
-          'Selecione o <b>motivo do cancelamento</b> e confirme.',
-          'Se pedir, o gerente digita a senha de autorização.'
-        ],
-        aviso: 'Venda paga no cartão: o estorno precisa ser feito também na maquininha. Chame o gerente.',
-        revisar: true
-      },
-      {
-        id: 'cadastrar-cliente-saipos',
-        categoria: 'saipos',
-        titulo: 'Como cadastrar um cliente na Saipos',
-        palavras: 'novo cliente telefone cpf delivery cadastro',
-        passos: [
-          'Ao abrir uma venda, clique no campo <b>Cliente</b>.',
-          'Digite o <b>telefone</b> do cliente — se já tiver cadastro, ele aparece.',
-          'Se não aparecer, clique em <b>Novo cliente</b>.',
-          'Preencha nome, telefone e, se for entrega, o endereço completo.',
-          'Clique em <b>Salvar</b>. O cliente fica vinculado à venda.'
-        ],
-        dica: 'Sempre confirme o telefone em voz alta com o cliente antes de salvar.',
-        revisar: true
-      },
-      {
         id: 'chamado-saipos',
         categoria: 'saipos',
         titulo: 'Como abrir um chamado na Saipos (suporte)',
@@ -306,90 +275,6 @@
         ],
         dica: 'Antes de abrir o chamado, procure a dúvida na Central de Ajuda da Saipos — muitas respostas já estão lá. Depois de abrir, avise o gerente e passe o número do protocolo.',
         link: { texto: '📖 Abrir Central de Ajuda Saipos', url: 'https://intercom.help/meajuda-saipos/pt-BR/' }
-      },
-      {
-        id: 'abrir-caixa-saipos',
-        categoria: 'saipos',
-        titulo: 'Como abrir o caixa na Saipos',
-        palavras: 'iniciar caixa fundo de troco turno',
-        passos: [
-          'Faça login na Saipos com seu usuário.',
-          'Clique em <b>Caixa</b> › <b>Abrir caixa</b>.',
-          'Informe o valor do <b>fundo de troco</b> que está na gaveta.',
-          'Confirme. Só é possível lançar vendas com o caixa aberto.'
-        ],
-        revisar: true
-      },
-      {
-        id: 'fechar-caixa-saipos',
-        categoria: 'saipos',
-        titulo: 'Como fechar o caixa na Saipos',
-        palavras: 'encerrar caixa fim do turno conferência sangria',
-        passos: [
-          'Confira se não há mesas ou comandas abertas.',
-          'Clique em <b>Caixa</b> › <b>Fechar caixa</b>.',
-          'Conte o dinheiro da gaveta e informe os valores de cada forma de pagamento.',
-          'Confirme e imprima o relatório de fechamento.',
-          'Entregue o relatório e o dinheiro ao gerente.'
-        ],
-        aviso: 'Se houver diferença de valores, não feche sozinho — chame o gerente.',
-        revisar: true
-      },
-      {
-        id: 'login-bar',
-        categoria: 'bar',
-        titulo: 'Como fazer login no sistema do bar',
-        palavras: 'entrar acessar senha usuário tablet bar',
-        passos: [
-          'Ligue o tablet/computador do bar (botão lateral / botão de energia).',
-          'Abra o aplicativo do sistema do bar.',
-          'Digite seu <b>usuário</b> e <b>senha</b> pessoais.',
-          'Confira se aparecem os pedidos do bar na tela.'
-        ],
-        dica: 'Esqueceu a senha? Peça ao gerente para redefinir. Não use o login de outra pessoa.',
-        revisar: true
-      },
-      {
-        id: 'login-kds',
-        categoria: 'cozinha',
-        titulo: 'Como fazer login no KDS da cozinha',
-        palavras: 'tela cozinha monitor pedidos kds entrar acessar',
-        passos: [
-          'Ligue a tela do KDS e aguarde carregar.',
-          'Abra o aplicativo/navegador do KDS.',
-          'Faça login com o usuário da cozinha.',
-          'Selecione a <b>estação</b> correta (ex.: cozinha, chapa, sobremesas).',
-          'Confira se os pedidos abertos aparecem na tela.'
-        ],
-        aviso: 'Se os pedidos não aparecerem, verifique a internet/Wi-Fi e avise o gerente imediatamente.',
-        revisar: true
-      },
-      {
-        id: 'ligar-som-salao',
-        categoria: 'salao',
-        titulo: 'Como ligar o som do salão',
-        palavras: 'música caixa de som amplificador volume playlist spotify',
-        passos: [
-          'Ligue o <b>amplificador</b> (local: ________).',
-          'Conecte o celular/computador da casa via Bluetooth ou cabo.',
-          'Abra a playlist do restaurante.',
-          'Ajuste o volume: comece baixo e aumente aos poucos.'
-        ],
-        dica: 'Volume ideal: dá para conversar na mesa sem precisar levantar a voz.',
-        revisar: true
-      },
-      {
-        id: 'desligar-som-salao',
-        categoria: 'rotina',
-        titulo: 'Como desligar o som no fechamento',
-        palavras: 'fechar desligar música amplificador',
-        passos: [
-          'Baixe o volume até o mínimo.',
-          'Pause a música no aparelho.',
-          'Desligue o <b>amplificador</b>.'
-        ],
-        dica: 'Desligar com o volume no mínimo evita estalo nas caixas.',
-        revisar: true
       }
     ];
 
@@ -412,7 +297,8 @@
     const textoSemTags = s => s.replace(/<[^>]+>/g, '');
 
     function renderChips() {
-      const opcoes = [['todas', { nome: 'Todas', icone: '' }], ...Object.entries(CATEGORIAS)];
+      const usadas = new Set(PROCEDIMENTOS.map(p => p.categoria));
+      const opcoes = [['todas', { nome: 'Todas', icone: '' }], ...Object.entries(CATEGORIAS).filter(([chave]) => usadas.has(chave))];
       chips.innerHTML = opcoes.map(([chave, c]) =>
         `<button class="chip${chave === categoriaAtiva ? ' ativo' : ''}" data-cat="${chave}">${c.icone} ${c.nome}</button>`
       ).join('');
