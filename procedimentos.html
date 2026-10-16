@@ -288,6 +288,7 @@
       h41club: { nome: 'H41 Club',           icone: '💰' },
       descontos: { nome: 'Descontos',        icone: '🏷️' },
       fornecimento: { nome: 'Fornecimento',  icone: '📦' },
+      equipe: { nome: 'Equipe',              icone: '👥' },
       bar:     { nome: 'Bar',                icone: '🍹' },
       cozinha: { nome: 'Cozinha',            icone: '👨‍🍳' },
       salao:   { nome: 'Salão',              icone: '🔊' },
@@ -430,6 +431,26 @@
           'Lance a marmita na Saipos pelo <b>valor padrão</b> (P R$ 22, M R$ 24, G R$ 26).',
           'Aplique o desconto de <b>R$ 2,00 por marmita</b>.',
           'Confira se o valor final ficou certo (P R$ 20, M R$ 22, G R$ 24) e feche a venda.'
+        ]
+      },
+      {
+        id: 'consumo-interno-funcionarios',
+        categoria: 'equipe',
+        titulo: 'Consumo interno de funcionários',
+        palavras: 'consumo interno funcionario colaborador equipe fiado conta desconto 15 por cento registro um mes alcool alcoolico cerveja chopp bebida',
+        resumo: 'Benefício para funcionários do restaurante: conta fiado e 15% de desconto.',
+        regras: [
+          '📅 <b>Só depois de 1 mês de registro.</b> Antes disso, o funcionário não tem conta fiado nem desconto.',
+          '📒 <b>Pode abrir conta fiado</b> no restaurante.',
+          '💲 <b>15% de desconto</b> nos itens do restaurante.',
+          '🍺 <b>Não vale para bebidas alcoólicas.</b> Elas são cobradas pelo valor cheio.',
+          '🚫 <b>Não escreva “cashback” no motivo do desconto.</b> Escreva só o motivo real (ex.: “consumo interno”).'
+        ],
+        passos: [
+          'Confirme que o funcionário tem <b>pelo menos 1 mês de registro</b>.',
+          'Abra uma venda na Saipos, lance os itens e identifique como cliente o <b>cadastro do funcionário</b>.',
+          'Aplique o desconto de <b>15% só nos itens que não são alcoólicos</b>.',
+          'Se for no fiado, feche a venda como <b>fiado</b>, lançando na conta do funcionário.'
         ]
       }
     ];
