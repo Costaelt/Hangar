@@ -175,6 +175,16 @@
       border-radius: 8px;
     }
     .regras h3, .passo-titulo { margin: 0 0 8px; font-size: 1em; }
+    .precos {
+      border-collapse: collapse;
+      margin-top: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .precos th, .precos td {
+      padding: 4px 12px 4px 0;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
     .regras ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
     .secao h3 { margin: 16px 0 6px; font-size: 1em; }
     .secao ul { margin: 0; padding-left: 20px; }
@@ -389,6 +399,28 @@
           'Aplique o <b>desconto de 100%</b>.',
           'Feche a venda como <b>fiado</b>, lançando na conta do Aeroclube.',
           'Colete a <b>assinatura no caderno</b>.'
+        ]
+      },
+      {
+        id: 'desconto-marmita-parceiros',
+        categoria: 'descontos',
+        titulo: 'Desconto em marmitas: hangares parceiros e Aeroclube',
+        palavras: 'marmita marmitex desconto 2 reais dois reais valor especial preço tamanho p m g hangar parceiro aeroclube',
+        resumo: 'Valor especial: R$ 2,00 de desconto no valor padrão da marmita.',
+        regras: [
+          '✅ <b>Tem direito:</b> hangares parceiros e Aeroclube.',
+          '💲 <b>Desconto de R$ 2,00</b> em cada marmita, sobre o valor padrão.' +
+            '<table class="precos"><tr><th>Tamanho</th><th>Valor padrão</th><th>Com desconto</th></tr>' +
+            '<tr><td>P</td><td>R$ 22,00</td><td><b>R$ 20,00</b></td></tr>' +
+            '<tr><td>M</td><td>R$ 24,00</td><td><b>R$ 22,00</b></td></tr>' +
+            '<tr><td>G</td><td>R$ 26,00</td><td><b>R$ 24,00</b></td></tr></table>',
+          '🚫 <b>Não escreva “cashback” no motivo do desconto.</b> Escreva só o motivo real (ex.: “marmita parceiro”).'
+        ],
+        passos: [
+          'Confirme que o cliente é de um <b>hangar parceiro</b> ou do <b>Aeroclube</b>.',
+          'Lance a marmita na Saipos pelo <b>valor padrão</b> (P R$ 22, M R$ 24, G R$ 26).',
+          'Aplique o desconto de <b>R$ 2,00 por marmita</b>.',
+          'Confira se o valor final ficou certo (P R$ 20, M R$ 22, G R$ 24) e feche a venda.'
         ]
       }
     ];
