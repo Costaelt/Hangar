@@ -289,6 +289,7 @@
       descontos: { nome: 'Descontos',        icone: '🏷️' },
       fornecimento: { nome: 'Fornecimento',  icone: '📦' },
       equipe: { nome: 'Equipe',              icone: '👥' },
+      fiado: { nome: 'Conta fiado',          icone: '📒' },
       bar:     { nome: 'Bar',                icone: '🍹' },
       cozinha: { nome: 'Cozinha',            icone: '👨‍🍳' },
       salao:   { nome: 'Salão',              icone: '🔊' },
@@ -372,7 +373,7 @@
           '🧾 <b>Toda marmita é lançada no sistema.</b> Nenhuma marmita sai sem lançamento.',
           '💯 <b>Desconto de 100%</b> em todas as marmitas dessas empresas.',
           '🪪 <b>Identificar a empresa na venda é obrigatório.</b> O cliente é a própria empresa: selecione o cadastro da ACOI, da AFRV ou da VEE ONE, conforme o pedido.',
-          '📒 <b>Feche a venda como fiado</b>, lançando na conta cadastrada da empresa.',
+          '📒 <b>Feche a venda como fiado</b>, lançando na conta cadastrada da empresa. Pagamento todo dia 5: veja <a href="#conta-fiado">Conta fiado</a>.',
           '✍️ <b>Não escreva “cashback” no motivo do desconto.</b> Escreva só o motivo real (ex.: “marmita ACOI”).'
         ],
         passos: [
@@ -392,7 +393,7 @@
           '🏢 <b>Vale só para vendas para a empresa Aeroclube.</b> Funcionários e alunos do Aeroclube comprando marmita para si têm outro desconto: veja <a href="#desconto-marmita-parceiros">Desconto em marmitas</a>.',
           '🧾 <b>Todo item fornecido ao Aeroclube é lançado no sistema.</b> Nenhum item sai sem lançamento.',
           '💯 <b>Desconto de 100%</b> em todos os itens, porque a nota fiscal é emitida depois.',
-          '📒 <b>Feche a venda como fiado</b>, lançando na conta do Aeroclube.',
+          '📒 <b>Feche a venda como fiado</b>, lançando na conta do Aeroclube. Pagamento todo dia 5: veja <a href="#conta-fiado">Conta fiado</a>.',
           '✍️ <b>Coletar a assinatura no caderno é obrigatório.</b>',
           '🚫 <b>Não escreva “cashback” no motivo do desconto.</b> Escreva só o motivo real (ex.: “fornecimento Aeroclube”).'
         ],
@@ -441,7 +442,7 @@
         resumo: 'Benefício para funcionários do restaurante: conta fiado e 15% de desconto.',
         regras: [
           '📅 <b>Só depois de 1 mês de registro.</b> Antes disso, o funcionário não tem conta fiado nem desconto.',
-          '📒 <b>Pode abrir conta fiado</b> no restaurante. <b>A conta é paga mensalmente, todo dia 5.</b>',
+          '📒 <b>Pode abrir conta fiado</b> no restaurante. <b>A conta é paga mensalmente, todo dia 5</b> (veja <a href="#conta-fiado">Conta fiado</a>).',
           '💲 <b>15% de desconto</b> nos itens do restaurante.',
           '🍺 <b>Não vale para bebidas alcoólicas.</b> Elas são cobradas pelo valor cheio.',
           '🚫 <b>Não escreva “cashback” no motivo do desconto.</b> Escreva só o motivo real (ex.: “consumo interno”).'
@@ -451,6 +452,32 @@
           'Abra uma venda na Saipos, lance os itens e identifique como cliente o <b>cadastro do funcionário</b>.',
           'Aplique o desconto de <b>15% só nos itens que não são alcoólicos</b>.',
           'Se for no fiado, feche a venda como <b>fiado</b>, lançando na conta do funcionário.'
+        ]
+      },
+      {
+        id: 'conta-fiado',
+        categoria: 'fiado',
+        titulo: 'Conta fiado: regras gerais',
+        palavras: 'fiado conta cliente pendura pagamento dia 5 mensal vencimento cobrança empresa funcionario hangar',
+        resumo: 'Regras que valem para todas as contas fiado: clientes, empresas e funcionários.',
+        regras: [
+          '📆 <b>Pagamento mensal, todo dia 5.</b> Vale para todas as contas fiado.',
+          '🪪 <b>Toda venda no fiado precisa do cliente identificado</b>, para ser lançada na conta certa.'
+        ],
+        passos: [
+          'Lance os itens na venda da Saipos.',
+          'Identifique como cliente o <b>cadastro da conta</b> (pessoa ou empresa).',
+          'Feche a venda como <b>fiado</b>, lançando na conta do cliente.'
+        ],
+        secoes: [
+          {
+            titulo: 'Regras específicas de cada conta',
+            itens: [
+              '<a href="#marmitas-acoi-afrv-veeone">Fornecimento de marmitas: ACOI / AFRV / VEE ONE</a>',
+              '<a href="#fornecimento-aeroclube">Fornecimento de itens para o Aeroclube</a>',
+              '<a href="#consumo-interno-funcionarios">Consumo interno de funcionários</a>'
+            ]
+          }
         ]
       }
     ];
