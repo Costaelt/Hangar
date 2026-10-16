@@ -185,6 +185,7 @@
       text-align: left;
       border-bottom: 1px solid var(--border);
     }
+    .corpo a:not(.botao-link) { color: inherit; font-weight: 600; }
     .regras ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
     .secao h3 { margin: 16px 0 6px; font-size: 1em; }
     .secao ul { margin: 0; padding-left: 20px; }
@@ -384,11 +385,12 @@
         id: 'fornecimento-aeroclube',
         categoria: 'fornecimento',
         titulo: 'Fornecimento de itens para o Aeroclube',
-        palavras: 'aeroclube fornecimento itens fiado conta desconto 100 assinatura caderno assinar',
-        resumo: 'Regras para qualquer item que o restaurante fornece ao Aeroclube.',
+        palavras: 'aeroclube empresa fornecimento itens fiado conta desconto 100 assinatura caderno assinar nota fiscal nf',
+        resumo: 'Regras para vendas para a <b>empresa</b> Aeroclube.',
         regras: [
+          '🏢 <b>Vale só para vendas para a empresa Aeroclube.</b> Funcionários e alunos do Aeroclube comprando marmita para si têm outro desconto: veja <a href="#desconto-marmita-parceiros">Desconto em marmitas</a>.',
           '🧾 <b>Todo item fornecido ao Aeroclube é lançado no sistema.</b> Nenhum item sai sem lançamento.',
-          '💯 <b>Desconto de 100%</b> em todos os itens.',
+          '💯 <b>Desconto de 100%</b> em todos os itens, porque a nota fiscal é emitida depois.',
           '📒 <b>Feche a venda como fiado</b>, lançando na conta do Aeroclube.',
           '✍️ <b>Coletar a assinatura no caderno é obrigatório.</b>',
           '🚫 <b>Não escreva “cashback” no motivo do desconto.</b> Escreva só o motivo real (ex.: “fornecimento Aeroclube”).'
@@ -405,19 +407,26 @@
         id: 'desconto-marmita-parceiros',
         categoria: 'descontos',
         titulo: 'Desconto em marmitas: hangares parceiros e Aeroclube',
-        palavras: 'marmita marmitex desconto 2 reais dois reais valor especial preço tamanho p m g hangar parceiro aeroclube',
+        palavras: 'marmita marmitex desconto 2 reais dois reais valor especial preço tamanho p m g hangar parceiro aeroclube aluno funcionario cracha flex solojet piloto',
         resumo: 'Valor especial: R$ 2,00 de desconto no valor padrão da marmita.',
         regras: [
-          '✅ <b>Tem direito:</b> hangares parceiros e Aeroclube.',
+          '✅ <b>Tem direito:</b> funcionários dos hangares e empresas de dentro do aeroporto (Aeroclube, Flex, Solojet etc.) e <b>funcionários e alunos do Aeroclube</b>.',
           '💲 <b>Desconto de R$ 2,00</b> em cada marmita, sobre o valor padrão.' +
             '<table class="precos"><tr><th>Tamanho</th><th>Valor padrão</th><th>Com desconto</th></tr>' +
             '<tr><td>P</td><td>R$ 22,00</td><td><b>R$ 20,00</b></td></tr>' +
             '<tr><td>M</td><td>R$ 24,00</td><td><b>R$ 22,00</b></td></tr>' +
             '<tr><td>G</td><td>R$ 26,00</td><td><b>R$ 24,00</b></td></tr></table>',
+          '❌ <b>Não tem direito:</b> empresas de fora do aeroporto e empresas que prestam serviço ao aeroporto.',
+          '✈️ <b>Pilotos:</b> só têm direito se forem funcionários de uma dessas empresas do aeroporto de Jundiaí. Piloto que não é funcionário aqui <b>não tem desconto</b>.',
+          '🪪 <b>Identificar o cliente na Saipos é obrigatório.</b> Sem identificação, não tem desconto.',
+          '🏢 <b>Venda para a empresa Aeroclube</b> não entra aqui: é desconto de 100% no fiado. Veja <a href="#fornecimento-aeroclube">Fornecimento de itens para o Aeroclube</a>.',
           '🚫 <b>Não escreva “cashback” no motivo do desconto.</b> Escreva só o motivo real (ex.: “marmita parceiro”).'
         ],
+        dica: 'Se o cliente não quiser se identificar, explique: <b>a troca é justa — o restaurante dá o desconto e, em troca, o cliente se identifica.</b>',
         passos: [
-          'Confirme que o cliente é de um <b>hangar parceiro</b> ou do <b>Aeroclube</b>.',
+          'Pergunte ao cliente em qual empresa do aeroporto ele trabalha (ou se é aluno do Aeroclube).',
+          '<b>Na dúvida, peça a identificação</b> (crachá, carteirinha etc.).',
+          '<b>Identifique o cliente na venda da Saipos.</b>',
           'Lance a marmita na Saipos pelo <b>valor padrão</b> (P R$ 22, M R$ 24, G R$ 26).',
           'Aplique o desconto de <b>R$ 2,00 por marmita</b>.',
           'Confira se o valor final ficou certo (P R$ 20, M R$ 22, G R$ 24) e feche a venda.'
