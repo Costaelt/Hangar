@@ -288,6 +288,13 @@
         categoria: 'saipos',
         titulo: 'Como abrir um chamado na Saipos (suporte)',
         palavras: 'suporte ajuda problema erro chat atendimento chamado contato cnpj protocolo',
+        resumo: 'Use quando tiver um problema na Saipos e precisar falar com o suporte.',
+        regras: [
+          '📖 <b>Antes de abrir o chamado, procure a dúvida na Central de Ajuda.</b> Muitas respostas já estão lá (botão abaixo).',
+          '🔢 <b>CNPJ do restaurante:</b> 55765273000119 (digite só os números).',
+          '📝 <b>Anote o número do protocolo</b> e passe ao responsável depois de abrir o chamado.',
+          '⏳ <b>Não feche a Saipos</b> enquanto espera a resposta no chat.'
+        ],
         passos: [
           { texto: 'Na tela da Saipos, clique no <b>botão azul do chat</b>, no canto inferior direito.', img: 'img/saipos-botao-chat.png' },
           'O chat do suporte abre. Escolha o <b>tema</b> do problema: <b>Cupom Fiscal</b>, <b>Problemas c/ Impressão</b>, <b>Problemas c/ Integrações</b>, <b>Boleto | Liberação</b> ou <b>Outros Assuntos</b>.',
@@ -297,7 +304,6 @@
           'Se possível, envie um print da tela com o erro.',
           'Aguarde a resposta no próprio chat — não feche a Saipos.'
         ],
-        dica: 'Antes de abrir o chamado, procure a dúvida na Central de Ajuda da Saipos — muitas respostas já estão lá. Depois de abrir, avise o responsável e passe o número do protocolo.',
         link: { texto: '📖 Abrir Central de Ajuda Saipos', url: 'https://intercom.help/meajuda-saipos/pt-BR/' }
       },
       {
@@ -306,22 +312,19 @@
         titulo: 'Desconto com cashback do H41 Club',
         palavras: 'cashback saldo desconto clube fidelidade h41 club debitar resgatar usar saldo',
         resumo: 'Use sempre que o cliente pedir para gastar o saldo de cashback na conta.',
+        regras: [
+          '💰 <b>Limite:</b> até <b>30% do valor da conta</b> e nunca mais que o saldo do cliente.',
+          '🪪 <b>Identificar o cliente na Saipos é obrigatório.</b> Sem cliente identificado, o sistema não sabe de quem debitar.',
+          '✍️ <b>Escreva <code>CASHBACK</code> no motivo do desconto.</b> Só no cashback: cortesia, consumo próprio, erro de cozinha, parceria e cupom levam só o motivo real.',
+          '⚠️ <b>Evite desconto manual de exatamente 30% que não seja cashback.</b> O sistema entende 30% exato como cashback e debita o saldo do cliente, se ele tiver.',
+          '🏷️ <b>Cupons</b> (10%, 15%, 20%, 25%) vão no campo de cupom da Saipos e não debitam cashback.'
+        ],
         passos: [
           '<b>Confira o saldo do cliente.</b><br>Veja o saldo no painel do H41 Club ou peça para o cliente mostrar no portal dele. O desconto não pode passar do saldo.',
           '<b>Identifique o cliente na venda.</b><br>Vincule o cadastro (telefone/nome) à comanda na Saipos antes de fechar. Sem cliente identificado o sistema não sabe de quem debitar.',
           '<b>Aplique o desconto manual.</b><br>No campo de desconto manual da Saipos, lance o valor em R$. Limite: <b>30% do valor da conta</b> e nunca mais que o saldo.',
           '<b>Escreva <code>CASHBACK</code> no motivo do desconto.</b><br>É essa palavra que faz o sistema debitar o saldo. Pode ser maiúscula ou minúscula, sozinha ou numa frase (ex.: “cashback cliente”).',
           '<b>Feche a venda normalmente.</b><br>O débito acontece sozinho em até 1 hora. Não precisa lançar nada no painel do H41 Club.'
-        ],
-        secoes: [
-          {
-            titulo: '⚠️ Atenção',
-            itens: [
-              '<b>Outros descontos não levam a palavra “cashback”.</b> Cortesia, consumo próprio, erro de cozinha, parceria e cupom: escreva só o motivo real.',
-              '<b>Evite lançar desconto manual de exatamente 30% que não seja cashback.</b> O sistema entende 30% exato como cashback e debita o saldo do cliente, se ele tiver.',
-              '<b>Cupons</b> (10%, 15%, 20%, 25%) não debitam cashback. Use o campo de cupom da Saipos para eles.'
-            ]
-          }
         ],
         dica: '<b>Esqueceu de escrever “cashback” ou de identificar o cliente?</b><br>Avise o responsável com o número da venda e o nome do cliente. O débito é lançado manualmente no painel, e o saldo fica correto para a próxima visita.'
       },
@@ -386,10 +389,10 @@
               <span class="titulo">${p.titulo}<span class="cat">${c.nome}</span></span>
             </summary>
             <div class="corpo">
-              ${p.link ? `<a class="botao-link" href="${p.link.url}" target="_blank" rel="noopener">${p.link.texto}</a>` : ''}
               ${p.resumo ? `<p class="resumo">${p.resumo}</p>` : ''}
-              ${p.regras ? `<div class="regras"><h3>📋 Regras</h3><ul>${p.regras.map(r => `<li>${r}</li>`).join('')}</ul></div>
-                <h3 class="passo-titulo">Passo a passo</h3>` : ''}
+              ${p.regras ? `<div class="regras"><h3>📋 Regras</h3><ul>${p.regras.map(r => `<li>${r}</li>`).join('')}</ul></div>` : ''}
+              ${p.link ? `<a class="botao-link" href="${p.link.url}" target="_blank" rel="noopener">${p.link.texto}</a>` : ''}
+              ${p.regras ? '<h3 class="passo-titulo">Passo a passo</h3>' : ''}
               <ol>${p.passos.map(s => typeof s === 'string'
                 ? `<li>${s}</li>`
                 : `<li>${s.texto}${s.img ? `<img src="${IMAGENS_EMBUTIDAS[s.img] || s.img}" alt="Imagem do passo" loading="lazy">` : ''}</li>`
