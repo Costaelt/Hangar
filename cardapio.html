@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardápio · Hangar 41</title>
+<meta name="description" content="Cardápio do Hangar 41 Bar e Restaurante – Aeroporto de Jundiaí.">
+<meta name="theme-color" content="#0c0c0a">
+<!--
+  CARDÁPIO HANGAR 41 — COMO EDITAR
+  ---------------------------------
+  1) Abra este arquivo no navegador com "?editar" no fim do endereço
+     (ex.: cardapio.html?editar) ou clique em "Área do restaurante" no rodapé.
+  2) Clique em qualquer nome, descrição ou preço para alterar. Use os botões
+     para adicionar, mover, ocultar ou excluir itens e para incluir fotos.
+  3) As alterações ficam salvas no navegador. Para publicar, clique em
+     "Baixar cardápio atualizado" e substitua este arquivo pelo baixado.
+  Também é possível editar direto o bloco JSON "dados-cardapio" abaixo.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0c0a;
+    --surface:#151512;
+    --surface-2:#1d1d19;
+    --cream:#f4f0d4;
+    --text:#e9e5cb;
+    --muted:#a19e88;
+    --line:rgba(244,240,212,.13);
+    --olive:#55611f;
+    --olive-2:#76852f;
+    --accent:#d3dc7c;
+    --danger:#e8775f;
+    --radius:14px;
+    --display:'Anton',Impact,'Arial Narrow',sans-serif;
+    --body:'PT Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:68px;-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4,p{margin:0}
+  a{color:inherit}
+  button{font:inherit;color:inherit}
+
+  /* ---------- Capa ---------- */
+  .hero{position:relative;overflow:hidden;padding:72px 16px 64px;text-align:center;
+    background:radial-gradient(120% 90% at 50% 0%,#1d1e15 0%,var(--bg) 70%)}
+  .hero::before,.hero::after{content:"";position:absolute;pointer-events:none}
+  .hero::before{top:0;right:0;width:min(42vw,300px);aspect-ratio:1;
+    background:linear-gradient(225deg,var(--olive) 0 22%,var(--cream) 22% 30%,transparent 30%);opacity:.9}
+  .hero::after{bottom:0;left:0;width:min(42vw,300px);aspect-ratio:1;
+    background:linear-gradient(45deg,var(--olive) 0 22%,var(--cream) 22% 30%,transparent 30%);opacity:.9}
+  .hero-inner{position:relative;z-index:1;max-width:640px;margin:0 auto}
+  .marca{font-size:.82rem;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);font-weight:700}
+  .marca .sep{opacity:.5;margin:0 .35em}
+  .hero-titulo{font-family:var(--display);font-weight:400;color:var(--cream);font-size:clamp(3.2rem,15vw,6.4rem);line-height:.95;margin:14px 0 18px;text-transform:uppercase;letter-spacing:.01em}
+  .hero-slogan{color:var(--text);font-size:1.05rem;max-width:30em;margin:0 auto;white-space:pre-line}
+  .hero-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;border:1px solid var(--line);
+    text-decoration:none;font-size:.9rem;font-weight:700;color:var(--cream);background:rgba(244,240,212,.04)}
+  .pill:hover{border-color:var(--accent)}
+  .pill svg{width:16px;height:16px}
+
+  /* ---------- Navegação ---------- */
+  .nav{position:sticky;top:0;z-index:20;background:rgba(12,12,10,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;scrollbar-width:none;max-width:1000px;margin:0 auto}
+  .nav-inner::-webkit-scrollbar{display:none}
+  .nav a{flex:none;text-decoration:none;font-size:.88rem;font-weight:700;padding:8px 14px;border-radius:999px;color:var(--muted);white-space:nowrap;transition:background .2s,color .2s}
+  .nav a:hover{color:var(--cream)}
+  .nav a.ativo{background:var(--cream);color:var(--bg)}
+
+  /* ---------- Seções ---------- */
+  main{max-width:1000px;margin:0 auto;padding:0 16px}
+  .secao{padding:56px 0 20px}
+  .secao + .secao{border-top:1px solid var(--line)}
+  .secao-head{margin-bottom:24px}
+  .etapa{display:block;font-size:.74rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+  .secao-titulo{font-family:var(--display);font-weight:400;font-size:clamp(2.5rem,10vw,3.8rem);line-height:1;color:var(--cream);letter-spacing:.01em}
+  .secao-sub{font-style:italic;color:var(--muted);font-size:1.05rem;margin-top:4px}
+  .secao-horario{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 14px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);font-size:.88rem;color:var(--cream)}
+  .secao-horario svg{width:15px;height:15px;flex:none;color:var(--accent)}
+
+  .grupos{display:grid;gap:40px}
+  @media (min-width:760px){
+    .grupos{grid-template-columns:1fr 1fr;column-gap:56px}
+    .grupo.largo{grid-column:1/-1}
+  }
+  .grupo-head{margin-bottom:6px}
+  .grupo-titulo{font-family:var(--display);font-weight:400;font-size:1.55rem;color:var(--cream);letter-spacing:.02em;line-height:1.15}
+  .grupo-nota{font-size:.85rem;color:var(--muted);margin-top:2px}
+
+  /* ---------- Itens ---------- */
+  .itens{display:grid}
+  .item{display:flex;flex-wrap:wrap;align-items:flex-start;gap:4px 14px;padding:13px 0;border-bottom:1px solid var(--line)}
+  .item:last-child{border-bottom:0}
+  .item-corpo{flex:1;min-width:0}
+  .item-linha{display:flex;align-items:baseline;gap:8px}
+  .item-nome{font-weight:700;font-size:1.06rem;color:var(--cream);line-height:1.25}
+  .leader{flex:1;min-width:14px;border-bottom:2px dotted rgba(244,240,212,.22);transform:translateY(-4px)}
+  .preco{font-style:italic;font-weight:700;color:var(--accent);white-space:nowrap;font-size:1.06rem}
+  .preco .rs{font-size:.78em;margin-right:2px}
+  .preco.texto .rs{display:none}
+  .item-desc{font-size:.88rem;color:var(--muted);margin-top:3px;white-space:pre-line;line-height:1.4}
+
+  /* grupos com fotos: cartões */
+  .com-foto .itens{gap:12px}
+  @media (min-width:760px){ .com-foto .itens{grid-template-columns:1fr 1fr;gap:14px 16px} }
+  .com-foto .item{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:12px;align-items:center}
+  .com-foto .item:last-child{border-bottom:1px solid var(--line)}
+
+  /* grupos com mais de um preço (chopp) */
+  .colunas{display:flex;justify-content:flex-end;gap:6px;padding:4px 0 6px;border-bottom:1px solid var(--line)}
+  .colunas span{width:76px;text-align:center;font-size:.7rem;line-height:1.2;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .item-precos{display:flex;gap:6px;align-self:center}
+  .item-precos .col{width:76px;text-align:center}
+
+  /* caixa promocional (happy hour) */
+  .grupo-promo{background:linear-gradient(140deg,var(--olive) 0%,#3d4716 100%);border-radius:var(--radius);padding:20px 18px 8px}
+  .grupo-promo .grupo-titulo{font-size:2rem}
+  .grupo-promo .grupo-nota{color:var(--cream);opacity:.85}
+  .grupo-promo .item{border-color:rgba(244,240,212,.2)}
+  .grupo-promo .item-desc{color:rgba(244,240,212,.75)}
+  .grupo-promo .preco{color:var(--cream)}
+  .grupo-promo .leader{border-color:rgba(244,240,212,.35)}
+
+  /* destaque (prato especial) */
+  .destaque{display:grid;gap:0;border-radius:var(--radius);overflow:hidden;background:linear-gradient(140deg,#1f2a3a 0%,#161d28 100%);border:1px solid rgba(244,240,212,.12)}
+  @media (min-width:760px){ .destaque{grid-template-columns:1.1fr 1fr} }
+  .destaque-corpo{padding:22px 20px 24px;display:flex;flex-direction:column;gap:10px;justify-content:center}
+  .selo{align-self:flex-start;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--bg);background:var(--accent);padding:4px 10px;border-radius:999px}
+  .destaque-nome{font-family:var(--display);font-weight:400;font-size:clamp(1.9rem,7vw,2.6rem);line-height:1.02;color:var(--cream);text-transform:uppercase}
+  .destaque .item-desc{font-size:.98rem;color:#cfd3dc}
+  .destaque .preco{font-size:1.8rem}
+
+  /* ---------- Espaços para fotos ---------- */
+  .foto{position:relative;margin:0;overflow:hidden;background:var(--surface-2);border-radius:var(--radius)}
+  .foto img{display:block;width:100%;height:100%;object-fit:cover}
+  .foto.vazia{border:1.5px dashed rgba(244,240,212,.22);
+    background:repeating-linear-gradient(135deg,rgba(244,240,212,.025) 0 12px,transparent 12px 24px),var(--surface-2)}
+  .foto-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:rgba(244,240,212,.38);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;text-align:center;padding:8px}
+  .foto-ph svg{width:28px;height:28px}
+  .foto.banner{width:100%;aspect-ratio:16/7;max-height:300px;margin-bottom:28px}
+  .foto.thumb{flex:none;width:92px;height:92px;border-radius:10px}
+  .foto.thumb .foto-ph em{display:none}
+  .foto.thumb .foto-ph svg{width:24px;height:24px}
+  .foto.destaque-foto{border-radius:0;min-height:220px;aspect-ratio:4/3}
+  .foto.destaque-foto.vazia{border:0;border-right:1.5px dashed rgba(244,240,212,.18)}
+  .foto-ph em{font-style:normal}
+
+  /* ---------- Informações ---------- */
+  .info-grid{display:grid;gap:16px}
+  @media (min-width:760px){ .info-grid{grid-template-columns:1fr 1fr} }
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .card h3{font-family:var(--display);font-weight:400;font-size:1.45rem;color:var(--cream);margin-bottom:10px;letter-spacing:.02em}
+  .card dl{margin:0;display:grid;gap:12px}
+  .card dt{font-weight:700;color:var(--cream);font-size:.95rem}
+  .card dd{margin:2px 0 0;color:var(--muted);font-size:.92rem;white-space:pre-line}
+  .panoramico{margin-top:16px;display:grid;gap:16px;padding:0;overflow:hidden}
+  @media (min-width:760px){ .panoramico{grid-template-columns:1fr 1fr;align-items:center} }
+  .panoramico .foto{border-radius:0;aspect-ratio:16/10;margin:0}
+  .panoramico .foto.vazia{border:0}
+  .panoramico-corpo{padding:4px 20px 22px}
+  @media (min-width:760px){ .panoramico-corpo{padding:22px 22px 22px 4px} }
+  .panoramico-corpo p{color:var(--text);white-space:pre-line}
+  .contato{text-align:center;padding:44px 0 8px;display:grid;gap:16px;justify-items:center}
+  .contato .satisfacao{max-width:36em;color:var(--text);white-space:pre-line}
+  .contato .endereco{font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cream);font-size:.92rem}
+  .contato-links{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+  footer.rodape{text-align:center;padding:32px 16px 40px;color:var(--muted);font-size:.78rem;letter-spacing:.04em;max-width:1000px;margin:0 auto}
+  footer.rodape .assinatura{font-family:var(--display);font-size:1.4rem;color:var(--cream);letter-spacing:.04em;margin-bottom:10px;text-transform:uppercase}
+  footer.rodape a.editar-link{display:inline-block;margin-top:18px;color:rgba(244,240,212,.28);text-decoration:none;font-size:.72rem}
+  footer.rodape a.editar-link:hover{color:var(--muted)}
+
+  /* ---------- Modo edição ---------- */
+  .ctrl{display:none}
+  .modo-edicao .ctrl{display:flex}
+  .modo-edicao body,body.modo-edicao{padding-bottom:150px}
+  body.modo-edicao .ed{outline:1px dashed rgba(211,220,124,.35);outline-offset:2px;border-radius:3px;cursor:text;min-width:1.5em;display:inline-block}
+  body.modo-edicao p.ed,body.modo-edicao h1.ed,body.modo-edicao h2.ed,body.modo-edicao h3.ed{display:block}
+  body.modo-edicao .ed:hover{outline-color:rgba(211,220,124,.7)}
+  body.modo-edicao .ed:focus{outline:2px solid var(--accent);background:rgba(211,220,124,.07)}
+  body.modo-edicao .ed:empty::before{content:attr(data-ph);color:rgba(244,240,212,.3);font-style:italic;font-weight:400}
+  body.modo-edicao .ctrl{display:flex}
+  body.modo-edicao .is-oculto{opacity:.38}
+  body.modo-edicao .foto[data-acao]{cursor:pointer}
+  body.modo-edicao .foto[data-acao]:hover{outline:2px solid var(--accent)}
+  body.modo-edicao.preview .ctrl{display:none}
+  body.modo-edicao.preview .ed{outline:0;background:none}
+  body.modo-edicao.preview .ed:empty{display:none}
+  body.modo-edicao.preview .is-oculto{display:none}
+
+  .item-ctrl{flex-basis:100%;gap:4px;flex-wrap:wrap;padding-top:6px}
+  .grupo-ctrl{gap:10px;align-items:center;margin-top:8px;font-size:.82rem;color:var(--muted)}
+  .grupo-ctrl label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+  .mini{border:1px solid var(--line);background:var(--surface-2);border-radius:7px;padding:3px 9px;font-size:.78rem;cursor:pointer;color:var(--text)}
+  .mini:hover{border-color:var(--accent)}
+  .mini.perigo:hover{border-color:var(--danger);color:var(--danger)}
+  .btn-add{margin-top:10px;width:100%;justify-content:center;border:1.5px dashed rgba(211,220,124,.45);background:transparent;color:var(--accent);border-radius:10px;padding:10px;font-weight:700;cursor:pointer}
+  .btn-add:hover{background:rgba(211,220,124,.07)}
+  .foto-ctrl{position:absolute;left:8px;bottom:8px;gap:6px;z-index:2}
+  .foto-ctrl .mini{background:rgba(12,12,10,.85)}
+
+  .ajuda{max-width:1000px;margin:16px auto 0;padding:0 16px}
+  .ajuda-box{background:#232617;border:1px solid var(--olive-2);border-radius:var(--radius);padding:14px 16px;font-size:.9rem;color:var(--cream)}
+  .ajuda-box strong{color:var(--accent)}
+  .ajuda-box ol{margin:6px 0 0;padding-left:20px}
+  .ajuda-box li{margin:2px 0}
+  body.preview .ajuda{display:none}
+
+  .barra{position:fixed;left:0;right:0;bottom:0;z-index:50;background:#1b1c16;border-top:1px solid var(--olive-2);box-shadow:0 -10px 30px rgba(0,0,0,.45);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+  .barra-inner{max-width:1000px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+  .barra-info{flex:1 1 220px;min-width:0;font-size:.82rem;color:var(--muted);line-height:1.3}
+  .barra-info strong{display:block;color:var(--cream);font-size:.92rem}
+  .barra-info .pendente{color:var(--accent)}
+  .barra label{display:inline-flex;gap:6px;align-items:center;font-size:.82rem;color:var(--text);cursor:pointer}
+  .btn{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:8px 13px;font-size:.86rem;font-weight:700;cursor:pointer}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primario{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+  .btn.primario:hover{filter:brightness(1.07)}
+  .toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);opacity:0;z-index:60;background:var(--cream);color:var(--bg);font-weight:700;font-size:.9rem;padding:10px 16px;border-radius:10px;transition:.25s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media print{
+    .nav,.barra,.ajuda,.ctrl,.editar-link,.foto.vazia,.hero-links,.contato-links{display:none!important}
+    body{background:#fff;color:#111}
+    .hero::before,.hero::after{display:none}
+    .secao{break-inside:avoid-page}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- ================= DADOS DO CARDÁPIO (produtos e preços) ================= -->
+<script type="application/json" id="dados-cardapio">
+{
+  "config": { "mostrarEspacosFoto": true },
+  "info": {
+    "marca": "Hangar 41",
+    "complemento": "Bar e Restaurante",
+    "titulo": "Plano de Voo",
+    "slogan": "Uma experiência única que combina boa gastronomia, aviação e momentos inesquecíveis.",
+    "horarios": [
+      { "rotulo": "Segunda e terça", "valor": "9h às 16h" },
+      { "rotulo": "Quarta, quinta e sexta", "valor": "9h às 21h" },
+      { "rotulo": "Sábado e domingo", "valor": "9h às 19h30" }
+    ],
+    "servicos": [
+      { "rotulo": "Almoço self service", "valor": "Segunda a sexta · 11h30 às 14h30" },
+      { "rotulo": "Almoço à la carte", "valor": "Sábado e domingo · 12h às 15h" },
+      { "rotulo": "Lanches e porções", "valor": "Quarta a sexta · 17h às 21h\nSábado e domingo · 15h às 19h" },
+      { "rotulo": "Happy hour", "valor": "Quarta e quinta · 17h às 20h30" }
+    ],
+    "panoramico": {
+      "titulo": "Voo Panorâmico",
+      "texto": "Eleve sua experiência no Hangar 41 e viva a sensação de voar.\nAlém da experiência gastronômica, conheça o voo panorâmico, realizado pelo Aeroclube de Jundiaí, parceiro do Hangar 41. Consulte nossa equipe.",
+      "foto": ""
+    },
+    "satisfacao": "Queremos que sua experiência seja perfeita. Se algo não estiver do jeito que você deseja, por favor fale conosco para garantir sua plena satisfação.",
+    "endereco": "Av. Antonio Pincinato, 2820 – Aeroporto",
+    "cidade": "Jundiaí – SP",
+    "whatsapp": "11 99787-5324",
+    "rodape": "Taxa de serviço opcional • Se beber, não dirija • Proibida a venda de álcool para menores de 18 anos."
+  },
+  "secoes": [
+    {
+      "id": "primeiro-voo",
+      "titulo": "Primeiro Voo",
+      "subtitulo": "Café da manhã",
+      "horario": "",
+      "foto": "",
+      "grupos": [
+        {
+          "titulo": "Pães & Salgados",
+          "comFoto": true,
+          "itens": [
+            { "nome": "Pão de queijo", "desc": "", "preco": "6", "foto": "" },
+            { "nome": "Pão na chapa", "desc": "", "preco": "6", "foto": "" },
+            { "nome": "Queijo quente", "desc": "", "preco": "10", "foto": "" },
+            { "nome": "Pão de batata recheado", "desc": "Com requeijão ou calabresa", "preco": "12", "foto": "" },
+            { "nome": "Salgado de hambúrguer", "desc": "", "preco": "12", "foto": "" },
+            { "nome": "Salgado assado", "desc": "", "preco": "12", "foto": "" }
+          ]
+        },
+        {
+          "titulo": "Bebidas quentes",
+          "largo": true,
+          "itens": [
+            { "nome": "Café expresso", "desc": "", "preco": "6" },
+            { "nome": "Café expresso duplo", "desc": "", "preco": "10" },
+            { "nome": "Café coado", "desc": "", "preco": "5" },
+            { "nome": "Café com leite", "desc": "", "preco": "8" },
+            { "nome": "Chocolate quente", "desc": "", "preco": "10" },
+            { "nome": "Capuccino", "desc": "", "preco": "14" },
+            { "nome": "Mocaccino", "desc": "", "preco": "14" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "altitudes-geladas",
+      "titulo": "Altitudes Geladas",
+      "subtitulo": "Bebidas geladas",
+      "horario": "",
+      "foto": "",
+      "grupos": [
+        {
+          "titulo": "Sucos & Soda",
+          "itens": [
+            { "nome": "Suco Del Valle", "desc": "Consulte os sabores disponíveis", "preco": "8" },
+            { "nome": "Suco natural", "desc": "Laranja | Limão", "preco": "12" },
+            { "nome": "Suco de polpa", "desc": "Consulte os sabores disponíveis", "preco": "14" },
+            { "nome": "Soda italiana", "desc": "Sem álcool", "preco": "16" }
+          ]
+        },
+        {
+          "titulo": "Águas",
+          "itens": [
+            { "nome": "Água", "desc": "", "preco": "6" },
+            { "nome": "Água com gás", "desc": "", "preco": "8" },
+            { "nome": "Água tônica", "desc": "", "preco": "9" }
+          ]
+        },
+        {
+          "titulo": "Energéticos & Isotônicos",
+          "itens": [
+            { "nome": "Monster", "desc": "", "preco": "15" },
+            { "nome": "Red Bull Original", "desc": "", "preco": "16" },
+            { "nome": "Red Bull Sabores", "desc": "", "preco": "18" },
+            { "nome": "Gatorade", "desc": "", "preco": "14" },
+            { "nome": "Powerade", "desc": "", "preco": "12" }
+          ]
+        },
+        {
+          "titulo": "Refrigerantes",
+          "itens": [
+            { "nome": "Coca-Cola 1L – vidro", "desc": "", "preco": "14" },
+            { "nome": "Coca-Cola 290ml – KS", "desc": "", "preco": "8" },
+            { "nome": "Itubaína 355ml – vidro", "desc": "", "preco": "8" },
+            { "nome": "Itubaína 600ml – vidro", "desc": "", "preco": "12" },
+            { "nome": "Refrigerante lata 350ml", "desc": "Coca-Cola | Guaraná Antarctica | Sprite | Fanta | Citrus", "preco": "10" },
+            { "nome": "H2OH! | Limoneto", "desc": "", "preco": "12" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "combustivel",
+      "titulo": "Combustível",
+      "subtitulo": "Chopp e cervejas",
+      "horario": "",
+      "foto": "",
+      "grupos": [
+        {
+          "titulo": "Chopp artesanal Grifo Beer",
+          "colunas": ["Pint 473ml", "Half-pint 285ml"],
+          "itens": [
+            { "nome": "Pilsen", "desc": "ABV 4,8% | IBU 10", "precos": ["16", "13"] },
+            { "nome": "Weiss", "desc": "ABV 5,1% | IBU 8", "precos": ["18", "14"] },
+            { "nome": "Session IPA", "desc": "ABV 5,0% | IBU 34", "precos": ["22", "16"] }
+          ]
+        },
+        {
+          "titulo": "Chopp artesanal Giffa",
+          "colunas": ["Pint 473ml", "Half-pint 285ml"],
+          "itens": [
+            { "nome": "Sour Amarena", "desc": "ABV 3,6% | IBU 5", "precos": ["18", "14"] }
+          ]
+        },
+        {
+          "titulo": "Cervejas",
+          "itens": [
+            { "nome": "Heineken 600ml", "desc": "", "preco": "20" },
+            { "nome": "Original 600ml", "desc": "", "preco": "18" },
+            { "nome": "Corona 600ml", "desc": "", "preco": "21" },
+            { "nome": "Heineken long neck 330ml", "desc": "", "preco": "12" },
+            { "nome": "Heineken Zero long neck 330ml", "desc": "", "preco": "14" },
+            { "nome": "Stella Pure Gold long neck 355ml", "desc": "", "preco": "14" },
+            { "nome": "Blue Moon long neck 355ml", "desc": "", "preco": "16" },
+            { "nome": "Amstel Ultra long neck 355ml", "desc": "", "preco": "12" }
+          ]
+        },
+        {
+          "titulo": "Happy Hour",
+          "tipo": "promo",
+          "nota": "Quarta e quinta · 17h às 20h30",
+          "itens": [
+            { "nome": "Original / Heineken 600ml", "desc": "Balde com 3 unidades", "preco": "52" },
+            { "nome": "Heineken LG 355ml", "desc": "Balde com 5 unidades", "preco": "48" },
+            { "nome": "Chopp Pilsen pint", "desc": "", "preco": "13" },
+            { "nome": "Caipirinha de cachaça", "desc": "", "preco": "15" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "potencia-maxima",
+      "titulo": "Potência Máxima",
+      "subtitulo": "Drinks, doses e vinhos",
+      "horario": "",
+      "foto": "",
+      "grupos": [
+        {
+          "titulo": "Drinks",
+          "comFoto": true,
+          "itens": [
+            { "nome": "Caipirinha – cachaça", "desc": "Consulte as opções de frutas disponíveis", "preco": "28", "foto": "" },
+            { "nome": "Caipiroska – vodka", "desc": "Consulte as opções de frutas disponíveis", "preco": "32", "foto": "" },
+            { "nome": "Saqueirinha – saquê", "desc": "Consulte as opções de frutas disponíveis", "preco": "30", "foto": "" },
+            { "nome": "Gin tropical", "desc": "Gin, Red Bull Tropical e laranja", "preco": "36", "foto": "" },
+            { "nome": "Gin & tonic", "desc": "Gin, água tônica e limão", "preco": "34", "foto": "" },
+            { "nome": "Negroni", "desc": "", "preco": "32", "foto": "" },
+            { "nome": "Aperol spritz", "desc": "", "preco": "30", "foto": "" },
+            { "nome": "Margarita", "desc": "Tequila, suco de limão e licor de laranja", "preco": "30", "foto": "" }
+          ]
+        },
+        {
+          "titulo": "Doses",
+          "itens": [
+            { "nome": "Whiskey Jameson", "desc": "", "preco": "30" },
+            { "nome": "Vodka Smirnoff", "desc": "", "preco": "24" },
+            { "nome": "Gin Beefeater / BEG", "desc": "", "preco": "24" },
+            { "nome": "Campari", "desc": "", "preco": "24" },
+            { "nome": "Tequila José Cuervo", "desc": "", "preco": "26" },
+            { "nome": "Jägermeister", "desc": "", "preco": "22" },
+            { "nome": "Cachaça Salinas Umburana", "desc": "", "preco": "12" },
+            { "nome": "Cachaça Ypióca", "desc": "", "preco": "8" },
+            { "nome": "Cachaça Velho Barreiro", "desc": "", "preco": "8" },
+            { "nome": "Cachaça Reserva da Casa", "desc": "", "preco": "16" }
+          ]
+        },
+        {
+          "titulo": "Vinhos",
+          "itens": [
+            { "nome": "Trapiche – Merlot", "desc": "", "preco": "88" },
+            { "nome": "Periquita – tinto", "desc": "", "preco": "99" },
+            { "nome": "Porca de Murça – branco", "desc": "", "preco": "99" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "decolagem",
+      "titulo": "Decolagem",
+      "subtitulo": "Entradas e porções",
+      "horario": "Qua a sex · 17h às 21h  |  Sáb e dom · 15h às 19h",
+      "foto": "",
+      "grupos": [
+        {
+          "titulo": "Porções",
+          "comFoto": true,
+          "itens": [
+            { "nome": "Mini pastéis", "desc": "10 unidades · Sabores: queijo | carne | misto", "preco": "32", "foto": "" },
+            { "nome": "Anel de cebola", "desc": "Empanado e frito", "preco": "24", "foto": "" },
+            { "nome": "Isca de frango", "desc": "Empanada na farinha panko e frita", "preco": "38", "foto": "" },
+            { "nome": "Bolinho de bacalhau", "desc": "6 unidades", "preco": "42", "foto": "" },
+            { "nome": "Kibe", "desc": "8 unidades", "preco": "38", "foto": "" },
+            { "nome": "Batata frita | 350g", "desc": "Adicionais: bacon R$ 6 | queijo R$ 4", "preco": "24", "foto": "" },
+            { "nome": "Calabresa | 300g", "desc": "", "preco": "34", "foto": "" },
+            { "nome": "Torresmo | 300g", "desc": "", "preco": "55", "foto": "" },
+            { "nome": "Pizza individual", "desc": "Consulte os sabores", "preco": "32", "foto": "" },
+            { "nome": "Bolinho de feijoada", "desc": "Bolinhos recheados com feijoada temperada, couve refogada e bacon. 8 unidades", "preco": "45", "foto": "" },
+            { "nome": "Coxinha de mortadela e raspas de limão siciliano", "desc": "Coxinhas crocantes recheadas com mortadela temperada e raspas de limão siciliano. 8 unidades", "preco": "45", "foto": "" },
+            { "nome": "Croqueta de porco", "desc": "Croquetes crocantes recheados com pernil de porco temperado. 8 unidades", "preco": "48", "foto": "" },
+            { "nome": "Coxinha de cogumelos", "desc": "Coxinhas recheadas com cogumelos. 8 unidades", "preco": "45", "foto": "" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "voo",
+      "titulo": "Voo",
+      "subtitulo": "Pratos principais",
+      "horario": "Sábado e domingo · 12h às 15h",
+      "foto": "",
+      "grupos": [
+        {
+          "titulo": "Especial da casa",
+          "tipo": "destaque",
+          "itens": [
+            { "nome": "Parmegiana do Comandante", "desc": "Suculento filé de frango empanado (crocância extra), coberto com molho de tomate rústico da casa, gratinado com uma generosa camada de queijo muçarela e parmesão. Acompanha arroz branco e batatas fritas.", "preco": "42", "foto": "" }
+          ]
+        },
+        {
+          "titulo": "Pratos",
+          "comFoto": true,
+          "itens": [
+            { "nome": "Parmegiana de carne", "desc": "Acompanha arroz branco e fritas", "preco": "44", "foto": "" },
+            { "nome": "Strogonoff de frango", "desc": "Acompanha arroz branco e fritas", "preco": "38", "foto": "" },
+            { "nome": "Strogonoff de carne", "desc": "Acompanha arroz branco e fritas", "preco": "40", "foto": "" },
+            { "nome": "Contra filé acebolado", "desc": "Acompanha arroz branco, feijão e fritas", "preco": "46", "foto": "" },
+            { "nome": "Omelete", "desc": "Acompanha arroz branco, feijão e fritas", "preco": "32", "foto": "" },
+            { "nome": "Prato kids", "desc": "Iscas de frango grelhado, arroz branco, feijão, fritas e legumes", "preco": "28", "foto": "" },
+            { "nome": "Salada individual", "desc": "Consulte a opção do dia", "preco": "12", "foto": "" }
+          ]
+        },
+        {
+          "titulo": "Acompanhamentos",
+          "itens": [
+            { "nome": "Arroz individual", "desc": "", "preco": "4" },
+            { "nome": "Feijão individual", "desc": "", "preco": "4" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "voo-duplo",
+      "titulo": "Voo Duplo",
+      "subtitulo": "Lanches de hambúrguer · acompanham batata frita",
+      "horario": "Qua a sex a partir das 17h  |  Sáb e dom a partir das 15h",
+      "foto": "",
+      "grupos": [
+        {
+          "titulo": "Burgers",
+          "comFoto": true,
+          "itens": [
+            { "nome": "Burger de Choripan", "desc": "Pão de hambúrguer, linguiça na chapa, molho chimichurri, rúcula e maionese.", "preco": "35", "foto": "" },
+            { "nome": "Burger do Chef", "desc": "Pão brioche, hambúrguer artesanal 180g, bacon, maionese, queijo, alface, tomate e picles.", "preco": "40", "foto": "" },
+            { "nome": "Burger de Gorgonzola", "desc": "Pão brioche, hambúrguer artesanal 180g, bacon, maionese, gorgonzola, rúcula, cebola crispy e mel.", "preco": "48", "foto": "" },
+            { "nome": "Burger Catupiry Empanado", "desc": "Pão brioche, hambúrguer artesanal 180g, catupiry empanado 150g, bacon, maionese e queijo.", "preco": "42", "foto": "" },
+            { "nome": "Burger Frango Empanado", "desc": "Pão brioche, frango empanado 180g, bacon, maionese, queijo, alface e tomate.", "preco": "38", "foto": "" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pouso-suave",
+      "titulo": "Pouso Suave",
+      "subtitulo": "Sobremesas",
+      "horario": "",
+      "foto": "",
+      "grupos": [
+        {
+          "titulo": "Sobremesas",
+          "comFoto": true,
+          "itens": [
+            { "nome": "Brownie", "desc": "Acompanha uma bola de sorvete", "preco": "20", "foto": "" },
+            { "nome": "Petit gâteau", "desc": "Acompanha uma bola de sorvete", "preco": "22", "foto": "" },
+            { "nome": "Cookies", "desc": "Acompanha uma bola de sorvete", "preco": "20", "foto": "" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- Estado ---------- */
+  var FONTE = document.getElementById('dados-cardapio').textContent;
+  var ORIGINAL = JSON.parse(FONTE);
+  var BASE = hash(FONTE);
+  var LS_KEY = 'hangar41-cardapio-rascunho';
+  var editando = /[?&]editar\b/.test(location.search) || location.hash === '#editar';
+  var data = clonar(ORIGINAL);
+  if (editando) {
+    var rasc = lerRascunho();
+    if (rasc && rasc.base === BASE && rasc.data) data = rasc.data;
+  }
+  data.config = data.config || { mostrarEspacosFoto: true };
+  var observer = null;
+  var alvoFoto = null;
+
+  /* ---------- Ícones ---------- */
+  var ICON = {
+    cam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.6"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    zap: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.3-.5.1-1 .1-1.7-.1-.4-.1-.9-.3-1.5-.6-2.7-1.2-4.4-3.9-4.5-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.7 1.1 1.4 1.8 1 .9 1.8 1.1 2.1 1.3.3.1.4.1.6-.1l.8-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3z"/></svg>',
+    pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>'
+  };
+
+  /* ---------- Utilidades ---------- */
+  function clonar(o){ return JSON.parse(JSON.stringify(o)); }
+  function hash(s){ var h = 5381; for (var i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) | 0; } return String(h >>> 0); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function getPath(p){ return p.split('.').reduce(function(o,k){ return o == null ? undefined : o[k]; }, data); }
+  function setPath(p, v){
+    var ks = p.split('.'), o = data;
+    for (var i = 0; i < ks.length - 1; i++) {
+      if (o[ks[i]] == null) o[ks[i]] = /^\d+$/.test(ks[i+1]) ? [] : {};
+      o = o[ks[i]];
+    }
+    o[ks[ks.length-1]] = v;
+  }
+  function pai(p){ var i = p.lastIndexOf('.'); return { lista: p.slice(0, i), idx: +p.slice(i+1) }; }
+  function isNum(v){ return /^\d+([.,]\d{1,2})?$/.test(String(v == null ? '' : v).trim()); }
+  function normPreco(s){
+    s = String(s).replace(/R\$\s*/i, '').trim();
+    if (isNum(s)) return String(parseFloat(s.replace(',', '.')));
+    return s;
+  }
+  function fmtPreco(v){
+    if (v == null || v === '') return '';
+    if (!isNum(v)) return String(v);
+    var n = parseFloat(String(v).replace(',', '.'));
+    return n % 1 === 0 ? String(n) : n.toFixed(2).replace('.', ',');
+  }
+  function lerRascunho(){ try { var s = localStorage.getItem(LS_KEY); return s ? JSON.parse(s) : null; } catch(e){ return null; } }
+
+  /* ---------- Blocos de renderização ---------- */
+  function ed(path, tag, cls, tipo, ph){
+    tipo = tipo || 'texto';
+    var v = getPath(path);
+    var mostrado = tipo === 'preco' ? fmtPreco(v) : (v == null ? '' : v);
+    return '<' + tag + ' class="ed ' + (cls || '') + '" data-path="' + path + '" data-tipo="' + tipo + '"' +
+      (ph ? ' data-ph="' + esc(ph) + '"' : '') + (editando ? ' contenteditable="true" spellcheck="true"' : '') + '>' +
+      esc(mostrado) + '</' + tag + '>';
+  }
+  function opt(path, tag, cls, tipo, ph){
+    var v = getPath(path);
+    if (!editando && (v == null || v === '')) return '';
+    return ed(path, tag, cls, tipo, ph);
+  }
+  function preco(path, vazio){
+    var v = getPath(path);
+    if (!editando && (v == null || v === '')) return vazio ? '<span class="preco">—</span>' : '';
+    var texto = v !== '' && v != null && !isNum(v);
+    return '<span class="preco' + (texto ? ' texto' : '') + '"><span class="rs">R$</span>' + ed(path, 'span', 'preco-valor', 'preco', '0') + '</span>';
+  }
+  function slotFoto(path, cls, alt){
+    var src = getPath(path);
+    if (!src && !editando && !data.config.mostrarEspacosFoto) return '';
+    var vazio = !src;
+    if (vazio && editando && !data.config.mostrarEspacosFoto) cls += ' some-no-preview';
+    return '<figure class="foto ' + cls + (vazio ? ' vazia' : ' tem') + '"' +
+      (editando ? ' data-acao="foto-up" data-path="' + path + '" title="Clique para escolher uma foto"' : '') + '>' +
+      (vazio ? '<span class="foto-ph">' + ICON.cam + '<em>' + (editando ? 'adicionar foto' : 'foto em breve') + '</em></span>'
+             : '<img src="' + esc(src) + '" alt="' + esc(alt || '') + '" loading="lazy">') +
+      (editando && cls.indexOf('thumb') === -1 ?
+        '<div class="ctrl foto-ctrl"><button type="button" class="mini" data-acao="foto-up" data-path="' + path + '">' + (vazio ? 'Enviar foto' : 'Trocar foto') + '</button>' +
+        '<button type="button" class="mini" data-acao="foto-link" data-path="' + path + '">Usar link</button>' +
+        (vazio ? '' : '<button type="button" class="mini perigo" data-acao="foto-del" data-path="' + path + '">Remover</button>') + '</div>' : '') +
+      '</figure>';
+  }
+  function ctrlItem(ip, comFoto, temFoto, oculto){
+    return '<div class="ctrl item-ctrl">' +
+      '<button type="button" class="mini" data-acao="up" data-path="' + ip + '" title="Mover para cima">↑</button>' +
+      '<button type="button" class="mini" data-acao="down" data-path="' + ip + '" title="Mover para baixo">↓</button>' +
+      '<button type="button" class="mini" data-acao="ocultar" data-path="' + ip + '">' + (oculto ? 'Mostrar no cardápio' : 'Ocultar (em falta)') + '</button>' +
+      (comFoto ? '<button type="button" class="mini" data-acao="foto-up" data-path="' + ip + '.foto">' + (temFoto ? 'Trocar foto' : 'Enviar foto') + '</button>' +
+                 '<button type="button" class="mini" data-acao="foto-link" data-path="' + ip + '.foto">Link da foto</button>' +
+                 (temFoto ? '<button type="button" class="mini perigo" data-acao="foto-del" data-path="' + ip + '.foto">Remover foto</button>' : '') : '') +
+      '<button type="button" class="mini perigo" data-acao="del" data-path="' + ip + '">Excluir</button>' +
+      '</div>';
+  }
+
+  function renderItem(it, ip, g){
+    var multi = Array.isArray(g.colunas) && g.colunas.length > 0;
+    var html = '<article class="item' + (it.oculto ? ' is-oculto' : '') + '">';
+    if (g.comFoto) html += slotFoto(ip + '.foto', 'thumb', it.nome);
+    html += '<div class="item-corpo"><div class="item-linha">' + ed(ip + '.nome', 'h4', 'item-nome', 'texto', 'Nome do item');
+    if (!multi) html += '<span class="leader" aria-hidden="true"></span>' + preco(ip + '.preco');
+    html += '</div>' + opt(ip + '.desc', 'p', 'item-desc', 'multi', 'Descrição (opcional)') + '</div>';
+    if (multi) {
+      html += '<div class="item-precos">' + g.colunas.map(function(c, ci){
+        return '<span class="col" title="' + esc(c) + '">' + preco(ip + '.precos.' + ci, true) + '</span>';
+      }).join('') + '</div>';
+    }
+    if (editando) html += ctrlItem(ip, !!g.comFoto, !!it.foto, !!it.oculto);
+    return html + '</article>';
+  }
+
+  function renderDestaque(it, ip, gp){
+    return '<article class="destaque' + (it.oculto ? ' is-oculto' : '') + '">' +
+      slotFoto(ip + '.foto', 'destaque-foto', it.nome) +
+      '<div class="destaque-corpo">' +
+        ed(gp + '.titulo', 'span', 'selo', 'texto', 'Selo') +
+        ed(ip + '.nome', 'h3', 'destaque-nome', 'texto', 'Nome do prato') +
+        opt(ip + '.desc', 'p', 'item-desc', 'multi', 'Descrição') +
+        preco(ip + '.preco') +
+        (editando ? ctrlItem(ip, false, false, !!it.oculto) : '') +
+      '</div></article>';
+  }
+
+  function renderGrupo(g, gp){
+    var tipo = g.tipo || 'lista';
+    var largo = g.comFoto || g.largo || tipo === 'destaque';
+    var visiveis = g.itens.map(function(it, k){ return { it: it, k: k }; }).filter(function(x){ return editando || !x.it.oculto; });
+    if (!editando && !visiveis.length) return '';
+    var html = '<div class="grupo grupo-' + tipo + (g.comFoto ? ' com-foto' : '') + (largo ? ' largo' : '') + '">';
+    if (tipo === 'destaque') {
+      html += visiveis.map(function(x){ return renderDestaque(x.it, gp + '.itens.' + x.k, gp); }).join('');
+    } else {
+      html += '<div class="grupo-head">' + opt(gp + '.titulo', 'h3', 'grupo-titulo', 'texto', 'Título do grupo') +
+              opt(gp + '.nota', 'p', 'grupo-nota', 'texto', 'Observação do grupo (opcional)');
+      if (editando) {
+        html += '<div class="ctrl grupo-ctrl"><label><input type="checkbox" data-acao="fotos-grupo" data-path="' + gp + '"' + (g.comFoto ? ' checked' : '') + '> Espaço para foto em cada item</label></div>';
+      }
+      html += '</div>';
+      if (Array.isArray(g.colunas) && g.colunas.length) {
+        html += '<div class="colunas" aria-hidden="true">' + g.colunas.map(function(c, ci){ return ed(gp + '.colunas.' + ci, 'span', '', 'texto', 'Coluna'); }).join('') + '</div>';
+      }
+      html += '<div class="itens">' + visiveis.map(function(x){ return renderItem(x.it, gp + '.itens.' + x.k, g); }).join('') + '</div>';
+    }
+    if (editando) html += '<button type="button" class="ctrl btn-add" data-acao="add" data-path="' + gp + '">+ Adicionar item</button>';
+    return html + '</div>';
+  }
+
+  function renderSecao(s, i){
+    var p = 'secoes.' + i;
+    var hor = getPath(p + '.horario');
+    return '<section class="secao" id="' + esc(s.id) + '">' +
+      '<header class="secao-head">' +
+        '<span class="etapa">Etapa ' + String(i + 1).padStart(2, '0') + '</span>' +
+        ed(p + '.titulo', 'h2', 'secao-titulo', 'texto', 'Título') +
+        opt(p + '.subtitulo', 'p', 'secao-sub', 'texto', 'Subtítulo (opcional)') +
+        (editando || hor ? '<p class="secao-horario">' + ICON.clock + ed(p + '.horario', 'span', '', 'texto', 'Horário (opcional)') + '</p>' : '') +
+      '</header>' +
+      slotFoto(p + '.foto', 'banner', s.titulo) +
+      '<div class="grupos">' + s.grupos.map(function(g, j){ return renderGrupo(g, p + '.grupos.' + j); }).join('') + '</div>' +
+      '</section>';
+  }
+
+  function linhas(lista, base){
+    return lista.map(function(h, k){
+      return '<div>' + ed(base + '.' + k + '.rotulo', 'dt', '', 'texto', 'Rótulo') + ed(base + '.' + k + '.valor', 'dd', '', 'multi', 'Horário') + '</div>';
+    }).join('');
+  }
+
+  function waLink(){ var d = String(data.info.whatsapp || '').replace(/\D/g, ''); return d ? 'https://wa.me/55' + d : ''; }
+  function mapaLink(){ return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((data.info.endereco || '') + ', ' + (data.info.cidade || '')); }
+
+  function render(){
+    var info = data.info;
+    var wa = waLink();
+    var html = '';
+    html += '<header class="hero"><div class="hero-inner">' +
+      '<p class="marca">' + ed('info.marca', 'span', '', 'texto', 'Nome') + '<span class="sep">·</span>' + ed('info.complemento', 'span', '', 'texto', 'Complemento') + '</p>' +
+      ed('info.titulo', 'h1', 'hero-titulo', 'texto', 'Título') +
+      opt('info.slogan', 'p', 'hero-slogan', 'multi', 'Frase de apresentação') +
+      '<div class="hero-links"><a class="pill" href="#horarios">' + ICON.clock + 'Horários</a>' +
+      (wa ? '<a class="pill" href="' + wa + '" target="_blank" rel="noopener">' + ICON.zap + 'WhatsApp</a>' : '') + '</div>' +
+      '</div></header>';
+
+    html += '<nav class="nav" aria-label="Seções do cardápio"><div class="nav-inner">' +
+      data.secoes.map(function(s){ return '<a href="#' + esc(s.id) + '">' + esc(s.titulo) + '</a>'; }).join('') +
+      '<a href="#horarios">Horários</a></div></nav>';
+
+    html += '<main>' + data.secoes.map(renderSecao).join('');
+
+    html += '<section class="secao info" id="horarios">' +
+      '<header class="secao-head"><span class="etapa">Informações de voo</span><h2 class="secao-titulo">Horários</h2></header>' +
+      '<div class="info-grid">' +
+        '<div class="card"><h3>Funcionamento</h3><dl>' + linhas(info.horarios || [], 'info.horarios') + '</dl></div>' +
+        '<div class="card"><h3>Serviços</h3><dl>' + linhas(info.servicos || [], 'info.servicos') + '</dl></div>' +
+      '</div>' +
+      '<div class="card panoramico">' + slotFoto('info.panoramico.foto', 'panoramico-foto', info.panoramico && info.panoramico.titulo) +
+        '<div class="panoramico-corpo">' + ed('info.panoramico.titulo', 'h3', '', 'texto', 'Título') + ed('info.panoramico.texto', 'p', '', 'multi', 'Texto') + '</div></div>' +
+      '<div class="contato">' +
+        opt('info.satisfacao', 'p', 'satisfacao', 'multi', 'Mensagem') +
+        '<p class="endereco">' + ed('info.endereco', 'span', '', 'texto', 'Endereço') + ' · ' + ed('info.cidade', 'span', '', 'texto', 'Cidade') + '</p>' +
+        '<div class="contato-links">' +
+          '<a class="pill" href="' + mapaLink() + '" target="_blank" rel="noopener">' + ICON.pin + 'Como chegar</a>' +
+          (wa || editando ? '<span class="pill">' + ICON.zap + (wa && !editando ? '<a href="' + wa + '" target="_blank" rel="noopener" style="text-decoration:none">' + esc(info.whatsapp) + '</a>' : ed('info.whatsapp', 'span', '', 'texto', 'WhatsApp')) + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '</section></main>';
+
+    html += '<footer class="rodape"><p class="assinatura">' + esc(info.marca) + '</p>' + ed('info.rodape', 'p', '', 'multi', 'Texto do rodapé') +
+      (editando ? '' : '<a class="editar-link" href="?editar">Área do restaurante</a>') + '</footer>';
+
+    document.getElementById('app').innerHTML = html;
+    observarNav();
+  }
+
+  /* ---------- Navegação ativa ---------- */
+  function observarNav(){
+    if (observer) observer.disconnect();
+    if (!('IntersectionObserver' in window)) return;
+    var nav = document.querySelector('.nav-inner');
+    var links = {};
+    nav.querySelectorAll('a').forEach(function(a){ links[a.getAttribute('href').slice(1)] = a; });
+    observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (!e.isIntersecting) return;
+        var a = links[e.target.id];
+        if (!a) return;
+        nav.querySelectorAll('a.ativo').forEach(function(x){ x.classList.remove('ativo'); });
+        a.classList.add('ativo');
+        nav.scrollTo({ left: a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2, behavior: 'smooth' });
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    document.querySelectorAll('main .secao').forEach(function(s){ observer.observe(s); });
+  }
+
+  /* ================= MODO EDIÇÃO ================= */
+  function salvar(){
+    var pendente = JSON.stringify(data) !== JSON.stringify(ORIGINAL);
+    try {
+      if (pendente) localStorage.setItem(LS_KEY, JSON.stringify({ base: BASE, data: data, em: Date.now() }));
+      else localStorage.removeItem(LS_KEY);
+    } catch(e) {
+      toast('O navegador ficou sem espaço para salvar (fotos grandes). Baixe o cardápio atualizado para não perder as alterações.', 6000);
+    }
+    var st = document.getElementById('status');
+    if (st) st.innerHTML = pendente
+      ? '<span class="pendente">Há alterações não publicadas.</span> Salvas neste navegador — clique em “Baixar cardápio atualizado” para publicar.'
+      : 'Nenhuma alteração em relação ao arquivo publicado.';
+  }
+
+  var toastTimer;
+  function toast(msg, ms){
+    var t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg; t.classList.add('on');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.classList.remove('on'); }, ms || 2600);
+  }
+
+  function commit(el){
+    var path = el.dataset.path, tipo = el.dataset.tipo;
+    var v = el.innerText.replace(/ /g, ' ');
+    v = tipo === 'multi' ? v.replace(/\n{3,}/g, '\n\n').trim() : v.replace(/\s*\n\s*/g, ' ').trim();
+    if (tipo === 'preco') {
+      v = normPreco(v);
+      el.textContent = fmtPreco(v);
+      var pr = el.closest('.preco'); if (pr) pr.classList.toggle('texto', v !== '' && !isNum(v));
+    }
+    if (v === '') el.innerHTML = '';
+    var atual = getPath(path);
+    if ((atual == null ? '' : String(atual)) === v) return;
+    setPath(path, v);
+    salvar();
+    if (/^secoes\.\d+\.titulo$/.test(path) || path === 'info.whatsapp') atualizarNav();
+  }
+  function atualizarNav(){
+    var as = document.querySelectorAll('.nav-inner a');
+    data.secoes.forEach(function(s, i){ if (as[i]) as[i].textContent = s.titulo; });
+  }
+
+  function rerender(){
+    var y = window.scrollY;
+    render();
+    window.scrollTo({ top: y, left: 0, behavior: 'instant' });
+  }
+
+  function lerImagem(file){
+    return new Promise(function(res, rej){
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function(){
+        var max = 1100, s = Math.min(1, max / Math.max(img.width, img.height));
+        var c = document.createElement('canvas');
+        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(url);
+        res(c.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); rej(new Error('imagem inválida')); };
+      img.src = url;
+    });
+  }
+
+  function acao(nome, path, el){
+    var ref, g, novo, nomeItem;
+    switch (nome) {
+      case 'add':
+        g = getPath(path);
+        novo = { nome: 'Novo item', desc: '' };
+        if (Array.isArray(g.colunas) && g.colunas.length) novo.precos = g.colunas.map(function(){ return ''; });
+        else novo.preco = '';
+        if (g.comFoto) novo.foto = '';
+        g.itens.push(novo);
+        salvar(); rerender();
+        var alvo = document.querySelector('[data-path="' + path + '.itens.' + (g.itens.length - 1) + '.nome"]');
+        if (alvo) { alvo.focus(); document.execCommand && document.execCommand('selectAll', false, null); }
+        break;
+      case 'del':
+        nomeItem = getPath(path + '.nome') || 'este item';
+        if (!confirm('Excluir “' + nomeItem + '” do cardápio?\n\nDica: se for algo temporário, use “Ocultar (em falta)”.')) return;
+        ref = pai(path); getPath(ref.lista).splice(ref.idx, 1);
+        salvar(); rerender(); toast('Item excluído');
+        break;
+      case 'up': case 'down':
+        ref = pai(path);
+        var lista = getPath(ref.lista), j = ref.idx + (nome === 'up' ? -1 : 1);
+        if (j < 0 || j >= lista.length) return;
+        var tmp = lista[ref.idx]; lista[ref.idx] = lista[j]; lista[j] = tmp;
+        salvar(); rerender();
+        break;
+      case 'ocultar':
+        var it = getPath(path); it.oculto = !it.oculto; if (!it.oculto) delete it.oculto;
+        salvar(); rerender(); toast(it.oculto ? 'Item oculto: não aparece para os clientes' : 'Item visível novamente');
+        break;
+      case 'foto-up':
+        alvoFoto = path;
+        document.getElementById('input-foto').click();
+        break;
+      case 'foto-link':
+        var url = prompt('Cole o link da imagem (https://...) ou o caminho do arquivo ao lado deste cardápio (ex.: fotos/burger-do-chef.jpg):', getPath(path) && String(getPath(path)).indexOf('data:') !== 0 ? getPath(path) : '');
+        if (url == null) return;
+        setPath(path, url.trim()); salvar(); rerender();
+        break;
+      case 'foto-del':
+        if (!confirm('Remover esta foto?')) return;
+        setPath(path, ''); salvar(); rerender();
+        break;
+    }
+  }
+
+  function exportarHTML(){
+    var doc = document.documentElement.cloneNode(true);
+    doc.querySelector('#app').innerHTML = '';
+    doc.querySelector('body').removeAttribute('class');
+    doc.querySelectorAll('.efemero').forEach(function(n){ n.parentNode.removeChild(n); });
+    var limpo = clonar(data);
+    doc.querySelector('#dados-cardapio').textContent = '\n' + JSON.stringify(limpo, null, 2).replace(/</g, '\\u003c') + '\n';
+    var html = '<!DOCTYPE html>\n' + doc.outerHTML;
+    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'cardapio.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+    toast('Arquivo baixado. Substitua o cardapio.html publicado por ele.', 4500);
+  }
+
+  function iniciarEdicao(){
+    document.body.classList.add('modo-edicao');
+
+    var ajuda = document.createElement('div');
+    ajuda.className = 'ajuda efemero';
+    ajuda.innerHTML = '<div class="ajuda-box"><strong>Modo edição do cardápio</strong>' +
+      '<ol><li>Clique em qualquer nome, descrição ou preço para alterar (no preço, digite só o número, ex.: 32 ou 32,50).</li>' +
+      '<li>Use os botões de cada item para mover, ocultar quando estiver em falta, excluir ou incluir foto. Clique nos espaços tracejados para enviar fotos.</li>' +
+      '<li>Tudo fica salvo neste navegador. Para publicar, clique em <strong>Baixar cardápio atualizado</strong> e substitua o arquivo do site.</li></ol></div>';
+    document.body.insertBefore(ajuda, document.getElementById('app'));
+
+    var barra = document.createElement('div');
+    barra.className = 'barra efemero';
+    barra.setAttribute('role', 'toolbar');
+    barra.innerHTML = '<div class="barra-inner">' +
+      '<div class="barra-info"><strong>Modo edição</strong><span id="status"></span></div>' +
+      '<label><input type="checkbox" id="opt-vazios"' + (data.config.mostrarEspacosFoto ? ' checked' : '') + '> Mostrar espaços de foto vazios aos clientes</label>' +
+      '<button type="button" class="btn" id="btn-preview">Pré-visualizar</button>' +
+      '<button type="button" class="btn primario" id="btn-baixar">Baixar cardápio atualizado</button>' +
+      '<button type="button" class="btn" id="btn-descartar">Descartar alterações</button>' +
+      '<button type="button" class="btn" id="btn-sair">Sair</button></div>';
+    document.body.appendChild(barra);
+
+    var t = document.createElement('div'); t.id = 'toast'; t.className = 'toast efemero'; t.setAttribute('role', 'status');
+    document.body.appendChild(t);
+
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*'; inp.id = 'input-foto'; inp.className = 'efemero'; inp.hidden = true;
+    document.body.appendChild(inp);
+    inp.addEventListener('change', function(){
+      var f = inp.files && inp.files[0]; inp.value = '';
+      if (!f || !alvoFoto) return;
+      var p = alvoFoto;
+      lerImagem(f).then(function(src){ setPath(p, src); salvar(); rerender(); toast('Foto adicionada'); })
+        .catch(function(){ toast('Não foi possível ler essa imagem.'); });
+    });
+
+    var app = document.getElementById('app');
+    app.addEventListener('focusout', function(e){ if (e.target.classList && e.target.classList.contains('ed')) commit(e.target); });
+    app.addEventListener('keydown', function(e){
+      var el = e.target;
+      if (!el.classList || !el.classList.contains('ed')) return;
+      if (e.key === 'Enter' && (el.dataset.tipo !== 'multi' || e.ctrlKey || e.metaKey)) { e.preventDefault(); el.blur(); }
+      if (e.key === 'Escape') { el.textContent = el.dataset.tipo === 'preco' ? fmtPreco(getPath(el.dataset.path)) : (getPath(el.dataset.path) || ''); el.blur(); }
+    });
+    app.addEventListener('paste', function(e){
+      if (!e.target.closest || !e.target.closest('.ed')) return;
+      e.preventDefault();
+      var txt = (e.clipboardData || window.clipboardData).getData('text');
+      document.execCommand('insertText', false, txt);
+    });
+    app.addEventListener('click', function(e){
+      if (e.target.closest('.ed') && e.target.closest('a')) e.preventDefault();
+      if (document.body.classList.contains('preview')) return;
+      var b = e.target.closest('[data-acao]');
+      if (!b || b.tagName === 'INPUT') return;
+      e.preventDefault();
+      acao(b.dataset.acao, b.dataset.path, b);
+    });
+    app.addEventListener('change', function(e){
+      var el = e.target;
+      if (el.dataset && el.dataset.acao === 'fotos-grupo') {
+        var g = getPath(el.dataset.path);
+        g.comFoto = el.checked;
+        if (!g.comFoto) delete g.comFoto;
+        salvar(); rerender();
+      }
+    });
+
+    document.getElementById('opt-vazios').addEventListener('change', function(e){
+      data.config.mostrarEspacosFoto = e.target.checked; salvar(); rerender();
+    });
+    document.getElementById('btn-preview').addEventListener('click', function(e){
+      var on = document.body.classList.toggle('preview');
+      e.target.textContent = on ? 'Voltar a editar' : 'Pré-visualizar';
+      document.querySelectorAll('#app .ed').forEach(function(el){ el.contentEditable = on ? 'false' : 'true'; });
+      document.querySelectorAll('#app .foto.vazia').forEach(function(f){ f.style.display = on && !data.config.mostrarEspacosFoto ? 'none' : ''; });
+    });
+    document.getElementById('btn-baixar').addEventListener('click', exportarHTML);
+    document.getElementById('btn-descartar').addEventListener('click', function(){
+      if (!confirm('Descartar todas as alterações feitas neste navegador e voltar ao cardápio publicado?')) return;
+      try { localStorage.removeItem(LS_KEY); } catch(e){}
+      data = clonar(ORIGINAL); data.config = data.config || { mostrarEspacosFoto: true };
+      document.getElementById('opt-vazios').checked = !!data.config.mostrarEspacosFoto;
+      salvar(); rerender(); toast('Alterações descartadas');
+    });
+    document.getElementById('btn-sair').addEventListener('click', function(){
+      if (JSON.stringify(data) !== JSON.stringify(ORIGINAL) &&
+          !confirm('As alterações continuam salvas neste navegador, mas só aparecem para os clientes depois de baixar e publicar o arquivo. Sair do modo edição?')) return;
+      location.href = location.pathname;
+    });
+  }
+
+  /* ---------- Início ---------- */
+  render();
+  if (editando) { iniciarEdicao(); salvar(); }
+})();
+</script>
+</body>
+</html>
