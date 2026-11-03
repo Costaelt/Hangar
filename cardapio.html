@@ -209,6 +209,24 @@
   .foto-ctrl{position:absolute;left:8px;bottom:8px;gap:6px;z-index:2}
   .foto-ctrl .mini{background:rgba(12,12,10,.85)}
 
+  /* editor de enquadramento (zoom/posição) das fotos */
+  .ajuste-modal{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:16px}
+  .ajuste-caixa{background:#1b1c16;border:1px solid var(--olive-2);border-radius:16px;padding:18px;max-width:100%;max-height:100%;overflow:auto;display:grid;gap:12px;justify-items:center;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  .ajuste-caixa h3{font-family:var(--display);font-weight:400;font-size:1.5rem;color:var(--cream);justify-self:start;letter-spacing:.02em}
+  .ajuste-dica{font-size:.85rem;color:var(--muted);justify-self:start;max-width:62ch}
+  .ajuste-quadro{position:relative;overflow:hidden;border-radius:10px;background:#000;cursor:grab;touch-action:none;outline:2px solid var(--accent);outline-offset:2px;flex:none}
+  .ajuste-quadro.arrastando{cursor:grabbing}
+  .ajuste-quadro img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-select:none;pointer-events:none}
+  .ajuste-quadro::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(90deg,transparent calc(33.33% - .5px),rgba(255,255,255,.28) calc(33.33% - .5px) calc(33.33% + .5px),transparent calc(33.33% + .5px) calc(66.66% - .5px),rgba(255,255,255,.28) calc(66.66% - .5px) calc(66.66% + .5px),transparent calc(66.66% + .5px)),
+               linear-gradient(180deg,transparent calc(33.33% - .5px),rgba(255,255,255,.28) calc(33.33% - .5px) calc(33.33% + .5px),transparent calc(33.33% + .5px) calc(66.66% - .5px),rgba(255,255,255,.28) calc(66.66% - .5px) calc(66.66% + .5px),transparent calc(66.66% + .5px))}
+  .ajuste-zoom{display:flex;align-items:center;gap:10px;width:100%;max-width:440px;color:var(--cream);font-weight:700}
+  .ajuste-zoom input{flex:1;accent-color:var(--accent)}
+  .ajuste-zoom button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface-2);cursor:pointer;font-size:1.1rem;line-height:1}
+  .ajuste-zoom output{min-width:48px;text-align:right;font-size:.85rem;color:var(--muted)}
+  .ajuste-botoes{display:flex;gap:8px;width:100%;flex-wrap:wrap;align-items:center}
+  .ajuste-botoes .espaco{flex:1}
+
   .ajuda{max-width:1000px;margin:16px auto 0;padding:0 16px}
   .ajuda-box{background:#232617;border:1px solid var(--olive-2);border-radius:var(--radius);padding:14px 16px;font-size:.9rem;color:var(--cream)}
   .ajuda-box strong{color:var(--accent)}
@@ -280,7 +298,8 @@
   .f-leader{flex:1;min-width:3mm;border-bottom:1.3px dotted var(--p-line2);transform:translateY(-.9mm)}
   .folha .preco{color:var(--p-accent);font-size:calc(10.5pt * var(--esc))}
   .f-desc{font-size:calc(8.3pt * var(--esc));color:var(--p-muted);line-height:1.3;margin-top:.3mm;white-space:pre-line}
-  .f-thumb{width:calc(15mm * var(--esc));height:calc(15mm * var(--esc));object-fit:cover;border-radius:1.6mm;flex:none}
+  .f-thumb{position:relative;overflow:hidden;width:calc(15mm * var(--esc));height:calc(15mm * var(--esc));border-radius:1.6mm;flex:none}
+  .f-thumb img{display:block;width:100%;height:100%;object-fit:cover}
   .f-colunas{display:flex;justify-content:flex-end;gap:2mm;padding-bottom:.6mm}
   .f-colunas span,.f-col{width:calc(17mm * var(--esc));text-align:center}
   .f-colunas span{font-size:calc(6.6pt * var(--esc));font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--p-muted);line-height:1.2}
@@ -745,17 +764,35 @@
     var texto = v !== '' && v != null && !isNum(v);
     return '<span class="preco' + (texto ? ' texto' : '') + '"><span class="rs">R$</span>' + ed(path, 'span', 'preco-valor', 'preco', '0') + '</span>';
   }
+  /* Enquadramento salvo de cada foto: { x, y } = ponto de foco em %, z = zoom (1 a 4).
+     Fica guardado ao lado da foto, com o sufixo "Ajuste" (ex.: "foto" -> "fotoAjuste"). */
+  function ajusteDe(path){
+    var a = getPath(path + 'Ajuste');
+    if (!a || typeof a !== 'object') return null;
+    return { x: isFinite(+a.x) ? +a.x : 50, y: isFinite(+a.y) ? +a.y : 50, z: isFinite(+a.z) && +a.z >= 1 ? +a.z : 1 };
+  }
+  function cssAjuste(a){
+    return 'object-position:' + a.x + '% ' + a.y + '%;transform-origin:' + a.x + '% ' + a.y + '%;transform:scale(' + a.z + ')';
+  }
+  function estiloImg(path){ var a = ajusteDe(path); return a ? ' style="' + cssAjuste(a) + '"' : ''; }
+  function limparAjuste(path){
+    var i = path.lastIndexOf('.'), dono = getPath(path.slice(0, i));
+    if (dono && typeof dono === 'object') delete dono[path.slice(i + 1) + 'Ajuste'];
+  }
+
   function slotFoto(path, cls, alt){
     var src = getPath(path);
     if (!src && !editando && !data.config.mostrarEspacosFoto) return '';
     var vazio = !src;
     if (vazio && editando && !data.config.mostrarEspacosFoto) cls += ' some-no-preview';
     return '<figure class="foto ' + cls + (vazio ? ' vazia' : ' tem') + '"' +
-      (editando ? ' data-acao="foto-up" data-path="' + path + '" title="Clique para escolher uma foto"' : '') + '>' +
+      (editando ? (vazio ? ' data-acao="foto-up" data-path="' + path + '" title="Clique para escolher uma foto"'
+                         : ' data-acao="foto-ajustar" data-path="' + path + '" title="Clique para ajustar zoom e enquadramento"') : '') + '>' +
       (vazio ? '<span class="foto-ph">' + ICON.cam + '<em>' + (editando ? 'adicionar foto' : 'foto em breve') + '</em></span>'
-             : '<img src="' + esc(src) + '" alt="' + esc(alt || '') + '" loading="lazy">') +
+             : '<img src="' + esc(src) + '" alt="' + esc(alt || '') + '" loading="lazy"' + estiloImg(path) + '>') +
       (editando && cls.indexOf('thumb') === -1 ?
-        '<div class="ctrl foto-ctrl"><button type="button" class="mini" data-acao="foto-up" data-path="' + path + '">' + (vazio ? 'Enviar foto' : 'Trocar foto') + '</button>' +
+        '<div class="ctrl foto-ctrl">' + (vazio ? '' : '<button type="button" class="mini" data-acao="foto-ajustar" data-path="' + path + '">Zoom / enquadrar</button>') +
+        '<button type="button" class="mini" data-acao="foto-up" data-path="' + path + '">' + (vazio ? 'Enviar foto' : 'Trocar foto') + '</button>' +
         '<button type="button" class="mini" data-acao="foto-link" data-path="' + path + '">Usar link</button>' +
         (vazio ? '' : '<button type="button" class="mini perigo" data-acao="foto-del" data-path="' + path + '">Remover</button>') + '</div>' : '') +
       '</figure>';
@@ -765,7 +802,8 @@
       '<button type="button" class="mini" data-acao="up" data-path="' + ip + '" title="Mover para cima">↑</button>' +
       '<button type="button" class="mini" data-acao="down" data-path="' + ip + '" title="Mover para baixo">↓</button>' +
       '<button type="button" class="mini" data-acao="ocultar" data-path="' + ip + '">' + (oculto ? 'Mostrar no cardápio' : 'Ocultar (em falta)') + '</button>' +
-      (comFoto ? '<button type="button" class="mini" data-acao="foto-up" data-path="' + ip + '.foto">' + (temFoto ? 'Trocar foto' : 'Enviar foto') + '</button>' +
+      (comFoto ? (temFoto ? '<button type="button" class="mini" data-acao="foto-ajustar" data-path="' + ip + '.foto">Zoom / enquadrar</button>' : '') +
+                 '<button type="button" class="mini" data-acao="foto-up" data-path="' + ip + '.foto">' + (temFoto ? 'Trocar foto' : 'Enviar foto') + '</button>' +
                  '<button type="button" class="mini" data-acao="foto-link" data-path="' + ip + '.foto">Link da foto</button>' +
                  (temFoto ? '<button type="button" class="mini perigo" data-acao="foto-del" data-path="' + ip + '.foto">Remover foto</button>' : '') : '') +
       '<button type="button" class="mini perigo" data-acao="del" data-path="' + ip + '">Excluir</button>' +
@@ -941,8 +979,9 @@
     var src = getPath(path);
     if (!src && !data.config.mostrarEspacosFoto) return '';
     return '<figure class="f-foto ' + cls + (src ? ' tem' : ' vazia') + '"' +
-      (editando ? ' data-acao="foto-up" data-path="' + path + '" title="Clique para escolher uma foto"' : '') + '>' +
-      (src ? '<img src="' + esc(src) + '" alt="' + esc(alt || '') + '">'
+      (editando ? (src ? ' data-acao="foto-ajustar" data-path="' + path + '" title="Clique para ajustar zoom e enquadramento"'
+                       : ' data-acao="foto-up" data-path="' + path + '" title="Clique para escolher uma foto"') : '') + '>' +
+      (src ? '<img src="' + esc(src) + '" alt="' + esc(alt || '') + '"' + estiloImg(path) + '>'
            : '<span class="foto-ph">' + ICON.cam + '<em>espaço para foto</em></span>') +
       '</figure>';
   }
@@ -951,7 +990,7 @@
   function pItem(it, ip, g){
     var multi = Array.isArray(g.colunas) && g.colunas.length > 0;
     var h = '<div class="f-item">';
-    if (it.foto) h += '<img class="f-thumb" src="' + esc(it.foto) + '" alt="' + esc(it.nome) + '">';
+    if (it.foto) h += '<span class="f-thumb"><img src="' + esc(it.foto) + '" alt="' + esc(it.nome) + '"' + estiloImg(ip + '.foto') + '></span>';
     h += '<div class="f-corpo"><div class="f-linha">' + ed(ip + '.nome', 'span', 'f-nome');
     if (!multi) h += '<span class="f-leader"></span>' + preco(ip + '.preco');
     h += '</div>' + optP(ip + '.desc', 'div', 'f-desc', 'multi') + '</div>';
@@ -1211,13 +1250,120 @@
       case 'foto-link':
         var url = prompt('Cole o link da imagem (https://...) ou o caminho do arquivo ao lado deste cardápio (ex.: fotos/burger-do-chef.jpg):', getPath(path) && String(getPath(path)).indexOf('data:') !== 0 ? getPath(path) : '');
         if (url == null) return;
+        if (url.trim() !== getPath(path)) limparAjuste(path);
         setPath(path, url.trim()); salvar(); rerender();
         break;
       case 'foto-del':
         if (!confirm('Remover esta foto?')) return;
-        setPath(path, ''); salvar(); rerender();
+        setPath(path, ''); limparAjuste(path); salvar(); rerender();
+        break;
+      case 'foto-ajustar':
+        abrirAjuste(path, el && el.closest ? el.closest('figure') : null);
         break;
     }
+  }
+
+  /* ---------- Editor de enquadramento: arrastar para posicionar, zoom por controle, roda ou pinça ---------- */
+  function abrirAjuste(path, fig){
+    var src = getPath(path);
+    if (!src) return;
+    var st = ajusteDe(path) || { x: 50, y: 50, z: 1 };
+    if (!fig) fig = document.querySelector((document.body.classList.contains('modo-impressao') ? '#print' : '#app') + ' figure[data-path="' + path + '"]');
+    var ratio = fig && fig.clientHeight ? fig.clientWidth / fig.clientHeight : 1;
+    if (!isFinite(ratio) || ratio <= 0) ratio = 1;
+    var maxW = Math.min(640, window.innerWidth - 68), maxH = Math.min(window.innerHeight * 0.55, 480);
+    var w = maxW, h = w / ratio;
+    if (h > maxH) { h = maxH; w = h * ratio; }
+    w = Math.round(w); h = Math.round(h);
+
+    var m = document.createElement('div');
+    m.className = 'ajuste-modal efemero';
+    m.innerHTML = '<div class="ajuste-caixa" role="dialog" aria-modal="true" aria-label="Ajustar enquadramento da foto">' +
+      '<h3>Ajustar enquadramento</h3>' +
+      '<p class="ajuste-dica">Arraste a foto para escolher a parte que aparece. Use o controle abaixo, a roda do mouse ou o gesto de pinça no celular para dar zoom. ' +
+      'O mesmo enquadramento vale para o cardápio digital e a versão impressa (onde o espaço pode ter outro formato).</p>' +
+      '<div class="ajuste-quadro" style="width:' + w + 'px;height:' + h + 'px"><img alt="" draggable="false"></div>' +
+      '<div class="ajuste-zoom"><button type="button" data-a="menos" aria-label="Diminuir zoom">−</button>' +
+      '<input type="range" min="1" max="4" step="0.01" aria-label="Zoom"><button type="button" data-a="mais" aria-label="Aumentar zoom">+</button><output></output></div>' +
+      '<div class="ajuste-botoes"><button type="button" class="btn" data-a="reset">Centralizar / sem zoom</button><span class="espaco"></span>' +
+      '<button type="button" class="btn" data-a="cancelar">Cancelar</button><button type="button" class="btn primario" data-a="salvar">Salvar enquadramento</button></div></div>';
+    document.body.appendChild(m);
+
+    var quadro = m.querySelector('.ajuste-quadro'), img = quadro.querySelector('img');
+    var range = m.querySelector('input[type=range]'), out = m.querySelector('output');
+    function clamp(v, a, b){ return Math.min(b, Math.max(a, v)); }
+    function aplicar(){
+      img.style.cssText = cssAjuste(st);
+      range.value = st.z;
+      out.textContent = Math.round(st.z * 100) + '%';
+    }
+    function mover(dx, dy){
+      var nw = img.naturalWidth || w, nh = img.naturalHeight || h;
+      var c = Math.max(w / nw, h / nh);
+      var px = (nw * c - w) * st.z + w * (st.z - 1);
+      var py = (nh * c - h) * st.z + h * (st.z - 1);
+      if (px > 0.5) st.x = clamp(st.x - dx / px * 100, 0, 100);
+      if (py > 0.5) st.y = clamp(st.y - dy / py * 100, 0, 100);
+      aplicar();
+    }
+    function zoom(z){ st.z = clamp(z, 1, 4); aplicar(); }
+    img.onload = aplicar;
+    img.src = src;
+    aplicar();
+
+    var ptrs = {}, distAnt = 0;
+    function dist(){ var k = Object.keys(ptrs); if (k.length < 2) return 0; var a = ptrs[k[0]], b = ptrs[k[1]]; return Math.hypot(a.x - b.x, a.y - b.y); }
+    quadro.addEventListener('pointerdown', function(e){
+      quadro.setPointerCapture(e.pointerId);
+      ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
+      distAnt = dist();
+      quadro.classList.add('arrastando');
+    });
+    quadro.addEventListener('pointermove', function(e){
+      var p = ptrs[e.pointerId];
+      if (!p) return;
+      var n = Object.keys(ptrs).length;
+      var dx = e.clientX - p.x, dy = e.clientY - p.y;
+      p.x = e.clientX; p.y = e.clientY;
+      if (n === 1) mover(dx, dy);
+      else { var d = dist(); if (distAnt > 0 && d > 0) zoom(st.z * d / distAnt); distAnt = d; }
+    });
+    function soltar(e){ delete ptrs[e.pointerId]; distAnt = dist(); if (!Object.keys(ptrs).length) quadro.classList.remove('arrastando'); }
+    quadro.addEventListener('pointerup', soltar);
+    quadro.addEventListener('pointercancel', soltar);
+    quadro.addEventListener('wheel', function(e){ e.preventDefault(); zoom(st.z * Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
+    range.addEventListener('input', function(){ zoom(+range.value); });
+
+    function fechar(){ document.removeEventListener('keydown', teclas, true); m.remove(); }
+    function salvarAjuste(){
+      var a = { x: Math.round(st.x * 10) / 10, y: Math.round(st.y * 10) / 10, z: Math.round(st.z * 100) / 100 };
+      if (a.z === 1 && a.x === 50 && a.y === 50) limparAjuste(path); else setPath(path + 'Ajuste', a);
+      fechar(); salvar(); rerender(); toast('Enquadramento salvo');
+    }
+    function teclas(e){
+      if (e.key === 'Escape') { e.preventDefault(); fechar(); }
+      else if (e.key === 'Enter') { e.preventDefault(); salvarAjuste(); }
+      else if (e.key === '+' || e.key === '=') zoom(st.z * 1.1);
+      else if (e.key === '-') zoom(st.z / 1.1);
+      else if (/^Arrow/.test(e.key) && e.target !== range) {
+        e.preventDefault();
+        var k = { ArrowLeft: [8, 0], ArrowRight: [-8, 0], ArrowUp: [0, 8], ArrowDown: [0, -8] }[e.key];
+        mover(k[0], k[1]);
+      }
+    }
+    document.addEventListener('keydown', teclas, true);
+    m.addEventListener('click', function(e){
+      if (e.target === m) { fechar(); return; }
+      var b = e.target.closest('[data-a]');
+      if (!b) return;
+      var a = b.dataset.a;
+      if (a === 'mais') zoom(st.z * 1.15);
+      else if (a === 'menos') zoom(st.z / 1.15);
+      else if (a === 'reset') { st = { x: 50, y: 50, z: 1 }; aplicar(); }
+      else if (a === 'cancelar') fechar();
+      else if (a === 'salvar') salvarAjuste();
+    });
+    m.querySelector('[data-a="salvar"]').focus();
   }
 
   function exportarHTML(){
@@ -1244,7 +1390,7 @@
     ajuda.className = 'ajuda efemero';
     ajuda.innerHTML = '<div class="ajuda-box"><strong>Modo edição do cardápio</strong>' +
       '<ol><li>Clique em qualquer nome, descrição ou preço para alterar (no preço, digite só o número, ex.: 32 ou 32,50).</li>' +
-      '<li>Use os botões de cada item para mover, ocultar quando estiver em falta, excluir ou incluir foto. Clique nos espaços tracejados para enviar fotos.</li>' +
+      '<li>Use os botões de cada item para mover, ocultar quando estiver em falta, excluir ou incluir foto. Clique nos espaços tracejados para enviar fotos e clique numa foto para ajustar o zoom e o enquadramento.</li>' +
       '<li>Tudo fica salvo neste navegador. Para publicar, clique em <strong>Baixar cardápio atualizado</strong> e substitua o arquivo do site.</li></ol></div>';
     document.body.insertBefore(ajuda, document.getElementById('app'));
 
@@ -1271,7 +1417,10 @@
       var f = inp.files && inp.files[0]; inp.value = '';
       if (!f || !alvoFoto) return;
       var p = alvoFoto;
-      lerImagem(f).then(function(src){ setPath(p, src); salvar(); rerender(); toast('Foto adicionada'); })
+      lerImagem(f).then(function(src){
+        setPath(p, src); limparAjuste(p); salvar(); rerender();
+        toast('Foto adicionada. Para ajustar o zoom, clique nela.', 3500);
+      })
         .catch(function(){ toast('Não foi possível ler essa imagem.'); });
     });
 
