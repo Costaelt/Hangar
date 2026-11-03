@@ -195,6 +195,12 @@
   .item-ctrl{flex-basis:100%;gap:4px;flex-wrap:wrap;padding-top:6px}
   .grupo-ctrl{gap:10px;align-items:center;margin-top:8px;font-size:.82rem;color:var(--muted)}
   .grupo-ctrl label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+  .cat-ctrl{flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:8px;padding:6px 8px;border-radius:9px;background:rgba(211,220,124,.06);border:1px solid rgba(211,220,124,.18)}
+  .cat-ctrl .rotulo{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-right:auto;padding-right:6px}
+  .secao-ctrl{margin-top:14px}
+  .btn-add-cat{margin-top:22px}
+  body.modo-edicao .grupo.is-oculto,body.modo-edicao .secao.is-oculto .secao-head,body.modo-edicao .secao.is-oculto .grupos{opacity:.38}
+  body.modo-edicao.preview .grupo.is-oculto,body.modo-edicao.preview .secao.is-oculto{display:none}
   .mini{border:1px solid var(--line);background:var(--surface-2);border-radius:7px;padding:3px 9px;font-size:.78rem;cursor:pointer;color:var(--text)}
   .mini:hover{border-color:var(--accent)}
   .mini.perigo:hover{border-color:var(--danger);color:var(--danger)}
@@ -794,12 +800,25 @@
       '</div></article>';
   }
 
+  // Botões para mover, ocultar ou excluir uma categoria (grupo) ou uma seção inteira.
+  function ctrlCategoria(path, nivel, oculto){
+    var nomeNivel = nivel === 'secao' ? 'seção' : 'categoria';
+    return '<div class="ctrl cat-ctrl' + (nivel === 'secao' ? ' secao-ctrl' : '') + '">' +
+      '<span class="rotulo">' + (nivel === 'secao' ? 'Seção' : 'Categoria') + (oculto ? ' · oculta' : '') + '</span>' +
+      '<button type="button" class="mini" data-acao="up" data-path="' + path + '" title="Mover ' + nomeNivel + ' para cima">↑</button>' +
+      '<button type="button" class="mini" data-acao="down" data-path="' + path + '" title="Mover ' + nomeNivel + ' para baixo">↓</button>' +
+      '<button type="button" class="mini" data-acao="ocultar-cat" data-path="' + path + '">' + (oculto ? 'Mostrar ' + nomeNivel : 'Ocultar ' + nomeNivel) + '</button>' +
+      '<button type="button" class="mini perigo" data-acao="del-cat" data-path="' + path + '">Excluir ' + nomeNivel + '</button>' +
+      '</div>';
+  }
+
   function renderGrupo(g, gp){
     var tipo = g.tipo || 'lista';
     var largo = g.comFoto || g.largo || tipo === 'destaque';
     var visiveis = g.itens.map(function(it, k){ return { it: it, k: k }; }).filter(function(x){ return editando || !x.it.oculto; });
-    if (!editando && !visiveis.length) return '';
-    var html = '<div class="grupo grupo-' + tipo + (g.comFoto ? ' com-foto' : '') + (largo ? ' largo' : '') + '">';
+    if (!editando && (g.oculto || !visiveis.length)) return '';
+    var html = '<div class="grupo grupo-' + tipo + (g.comFoto ? ' com-foto' : '') + (largo ? ' largo' : '') + (g.oculto ? ' is-oculto' : '') + '">';
+    if (editando) html += ctrlCategoria(gp, 'grupo', g.oculto);
     if (tipo === 'destaque') {
       html += visiveis.map(function(x){ return renderDestaque(x.it, gp + '.itens.' + x.k, gp); }).join('');
     } else {
@@ -818,18 +837,26 @@
     return html + '</div>';
   }
 
+  function numeroEtapa(i){
+    var n = 0;
+    for (var k = 0; k <= i; k++) if (!data.secoes[k].oculto) n++;
+    return String(n).padStart(2, '0');
+  }
   function renderSecao(s, i){
+    if (s.oculto && !editando) return '';
     var p = 'secoes.' + i;
     var hor = getPath(p + '.horario');
-    return '<section class="secao" id="' + esc(s.id) + '">' +
+    return '<section class="secao' + (s.oculto ? ' is-oculto' : '') + '" id="' + esc(s.id) + '">' +
       '<header class="secao-head">' +
-        '<span class="etapa">Etapa ' + String(i + 1).padStart(2, '0') + '</span>' +
+        '<span class="etapa">' + (s.oculto ? 'Seção oculta' : 'Etapa ' + numeroEtapa(i)) + '</span>' +
         ed(p + '.titulo', 'h2', 'secao-titulo', 'texto', 'Título') +
         opt(p + '.subtitulo', 'p', 'secao-sub', 'texto', 'Subtítulo (opcional)') +
         (editando || hor ? '<p class="secao-horario">' + ICON.clock + ed(p + '.horario', 'span', '', 'texto', 'Horário (opcional)') + '</p>' : '') +
+      (editando ? ctrlCategoria(p, 'secao', s.oculto) : '') +
       '</header>' +
       slotFoto(p + '.foto', 'banner', s.titulo) +
       '<div class="grupos">' + s.grupos.map(function(g, j){ return renderGrupo(g, p + '.grupos.' + j); }).join('') + '</div>' +
+      (editando ? '<button type="button" class="ctrl btn-add btn-add-cat" data-acao="add-cat" data-path="' + p + '">+ Adicionar categoria nesta seção</button>' : '') +
       '</section>';
   }
 
@@ -855,7 +882,7 @@
       '</div></header>';
 
     html += '<nav class="nav" aria-label="Seções do cardápio"><div class="nav-inner">' +
-      data.secoes.map(function(s){ return '<a href="#' + esc(s.id) + '">' + esc(s.titulo) + '</a>'; }).join('') +
+      data.secoes.filter(function(s){ return !s.oculto; }).map(function(s){ return '<a href="#' + esc(s.id) + '">' + esc(s.titulo) + '</a>'; }).join('') +
       '<a href="#horarios">Horários</a></div></nav>';
 
     html += '<main>' + data.secoes.map(renderSecao).join('');
@@ -934,6 +961,7 @@
 
   function pGrupo(g, gp){
     var tipo = g.tipo || 'lista';
+    if (g.oculto) return '';
     var itens = g.itens.map(function(it, k){ return { it: it, k: k }; }).filter(function(x){ return !x.it.oculto; });
     if (!itens.length) return '';
     if (tipo === 'destaque') {
@@ -974,10 +1002,11 @@
       pSlot('info.boasVindasFoto', 'f-banner', info.marca) + '</div>' + pe(n) + '</section>';
     // 3. Uma página por seção do cardápio
     data.secoes.forEach(function(s, i){
+      if (s.oculto) return;
       n++;
       var p = 'secoes.' + i, hor = getPath(p + '.horario');
       html += '<section class="folha"><div class="folha-in">' +
-        '<header class="f-head"><span class="f-etapa">Etapa ' + String(i + 1).padStart(2, '0') + '</span>' +
+        '<header class="f-head"><span class="f-etapa">Etapa ' + numeroEtapa(i) + '</span>' +
         ed(p + '.titulo', 'h2', 'f-titulo') + optP(p + '.subtitulo', 'p', 'f-sub') +
         (hor ? '<p class="f-horario">' + ICON.clock + ed(p + '.horario', 'span', '') + '</p>' : '') + '</header>' +
         '<div class="f-grupos">' + s.grupos.map(function(g, j){ return pGrupo(g, p + '.grupos.' + j); }).join('') + '</div>' +
@@ -1094,8 +1123,10 @@
     else { renderPrint(); if (/^secoes\.\d+\.titulo$/.test(path)) atualizarNav(); }
   }
   function atualizarNav(){
-    var as = document.querySelectorAll('.nav-inner a');
-    data.secoes.forEach(function(s, i){ if (as[i]) as[i].textContent = s.titulo; });
+    data.secoes.forEach(function(s){
+      var a = document.querySelector('.nav-inner a[href="#' + s.id + '"]');
+      if (a) a.textContent = s.titulo;
+    });
   }
 
   function rerender(){
@@ -1152,6 +1183,26 @@
       case 'ocultar':
         var it = getPath(path); it.oculto = !it.oculto; if (!it.oculto) delete it.oculto;
         salvar(); rerender(); toast(it.oculto ? 'Item oculto: não aparece para os clientes' : 'Item visível novamente');
+        break;
+      case 'ocultar-cat':
+        var cat = getPath(path); cat.oculto = !cat.oculto; if (!cat.oculto) delete cat.oculto;
+        salvar(); rerender();
+        toast(cat.oculto ? '“' + (cat.titulo || 'Categoria') + '” oculta: não aparece para os clientes nem na impressão' : '“' + (cat.titulo || 'Categoria') + '” visível novamente', 3500);
+        break;
+      case 'del-cat':
+        var c = getPath(path), ehSecao = /^secoes\.\d+$/.test(path);
+        var qtd = ehSecao ? c.grupos.reduce(function(t, g){ return t + g.itens.length; }, 0) : c.itens.length;
+        if (!confirm('Excluir ' + (ehSecao ? 'a seção' : 'a categoria') + ' “' + (c.titulo || 'sem título') + '” e ' +
+          (qtd === 1 ? 'o 1 item dela' : 'os ' + qtd + ' itens dela') + '?\n\nDica: se for temporário, use “Ocultar” — dá para mostrar de novo depois.')) return;
+        ref = pai(path); getPath(ref.lista).splice(ref.idx, 1);
+        salvar(); rerender(); toast((ehSecao ? 'Seção' : 'Categoria') + ' excluída. Para desfazer, use “Descartar alterações”.', 4000);
+        break;
+      case 'add-cat':
+        var secao = getPath(path);
+        secao.grupos.push({ titulo: 'Nova categoria', itens: [{ nome: 'Novo item', desc: '', preco: '' }] });
+        salvar(); rerender();
+        var t = document.querySelector('#app [data-path="' + path + '.grupos.' + (secao.grupos.length - 1) + '.titulo"]');
+        if (t) { t.focus(); document.execCommand && document.execCommand('selectAll', false, null); }
         break;
       case 'foto-up':
         alvoFoto = path;
