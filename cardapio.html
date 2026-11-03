@@ -97,12 +97,12 @@
   .item:last-child{border-bottom:0}
   .item-corpo{flex:1;min-width:0}
   .item-linha{display:flex;align-items:baseline;gap:8px}
-  .item-nome{font-weight:700;font-size:1.06rem;color:var(--cream);line-height:1.25}
+  .item-nome{font-weight:700;font-size:1.12rem;color:var(--cream);line-height:1.25}
   .leader{flex:1;min-width:14px;border-bottom:2px dotted rgba(244,240,212,.22);transform:translateY(-4px)}
-  .preco{font-style:italic;font-weight:700;color:var(--accent);white-space:nowrap;font-size:1.06rem}
+  .preco{font-style:italic;font-weight:700;color:var(--accent);white-space:nowrap;font-size:1.12rem}
   .preco .rs{font-size:.78em;margin-right:2px}
   .preco.texto .rs{display:none}
-  .item-desc{font-size:.88rem;color:var(--muted);margin-top:3px;white-space:pre-line;line-height:1.4}
+  .item-desc{font-size:.95rem;color:var(--muted);margin-top:3px;white-space:pre-line;line-height:1.4}
 
   /* grupos com fotos: cartões */
   .com-foto .itens{gap:12px}
@@ -284,7 +284,7 @@
   .print-bar select{font:inherit;font-size:.85rem;background:var(--surface-2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
   .print-dica{flex-basis:100%;text-align:center;font-size:.76rem;color:var(--muted)}
 
-  .folhas{display:flex;flex-direction:column;align-items:center;gap:26px;
+  .folhas{--fi:1.15;display:flex;flex-direction:column;align-items:center;gap:26px;
     --p-bg:#0c0c0a;--p-text:#e9e5cb;--p-cream:#f4f0d4;--p-muted:#a9a690;--p-accent:#d3dc7c;
     --p-line:rgba(244,240,212,.18);--p-line2:rgba(244,240,212,.32);--p-surface:#181815;
     --p-olive:#55611f;--p-olive-text:#f8f6e6;--p-tri:#f4f0d4;
@@ -310,17 +310,17 @@
   .f-grupos{display:flex;flex-direction:column;gap:7mm}
   .f-grupo{min-width:0}
   .f-grupo.largo{grid-column:1/-1}
-  .f-grupo-titulo{font-family:var(--display);font-weight:400;font-size:calc(16pt * var(--esc));color:var(--p-cream);letter-spacing:.02em;line-height:1.15;padding-bottom:1.2mm;border-bottom:1px solid var(--p-line);margin-bottom:.8mm}
-  .f-grupo-nota{font-size:calc(8.5pt * var(--esc));color:var(--p-muted);margin:0 0 1mm}
+  .f-grupo-titulo{font-family:var(--display);font-weight:400;font-size:calc(17pt * var(--esc) * var(--fi));color:var(--p-cream);letter-spacing:.02em;line-height:1.15;padding-bottom:1.2mm;border-bottom:1px solid var(--p-line);margin-bottom:.8mm}
+  .f-grupo-nota{font-size:calc(9.5pt * var(--esc) * var(--fi));color:var(--p-muted);margin:0 0 1mm}
   .f-lista-2 .f-itens{columns:2;column-gap:10mm}
-  .f-item{display:flex;gap:2.5mm;align-items:center;padding:2.3mm 0;break-inside:avoid;border-bottom:1px solid var(--p-line)}
+  .f-item{display:flex;gap:2.5mm;align-items:center;padding:calc(2.4mm * var(--fi)) 0;break-inside:avoid;border-bottom:1px solid var(--p-line)}
   .f-cont-tag{font-family:var(--body);font-size:7.5pt;letter-spacing:.18em;text-transform:uppercase;color:var(--p-muted);vertical-align:middle;margin-left:2mm}
   .f-head-cont{margin-bottom:5mm}
   .f-titulo-cont{font-size:22pt}
   /* cartões com foto ao fundo, como no cardápio digital */
   .f-com-foto .f-itens{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin-top:1.5mm}
-  .f-card{border:1px solid var(--p-line);border-radius:3mm;background:var(--p-surface);padding:3.4mm 3.8mm;position:relative;overflow:hidden;min-height:17mm}
-  .f-card.com-fundo{min-height:23mm}
+  .f-card{border:1px solid var(--p-line);border-radius:3mm;background:var(--p-surface);padding:calc(3.4mm * var(--fi)) 3.8mm;position:relative;overflow:hidden;min-height:calc(17mm * var(--fi))}
+  .f-card.com-fundo{min-height:calc(24mm * var(--fi))}
   .f-card .f-fundo{position:absolute;top:0;bottom:0;right:0;width:62%;overflow:hidden;z-index:0;opacity:.92}
   .f-card .f-fundo .f-quadro{
     -webkit-mask-image:radial-gradient(ellipse 95% 120% at 85% 50%,#000 25%,rgba(0,0,0,.5) 60%,transparent 100%);
@@ -330,19 +330,19 @@
   .f-card.com-fundo .f-nome,.f-card.com-fundo .preco,.f-card.com-fundo .f-desc{text-shadow:0 0 3px var(--p-bg),0 0 8px var(--p-bg)}
   .f-corpo{flex:1;min-width:0}
   .f-linha{display:flex;align-items:baseline;gap:1.5mm}
-  .f-nome{font-weight:700;color:var(--p-cream);font-size:calc(11pt * var(--esc));line-height:1.22}
+  .f-nome{font-weight:700;color:var(--p-cream);font-size:calc(11.5pt * var(--esc) * var(--fi));line-height:1.22}
   .f-leader{flex:1;min-width:3mm;border-bottom:1.3px dotted var(--p-line2);transform:translateY(-.9mm)}
-  .folha .preco{color:var(--p-accent);font-size:calc(11pt * var(--esc))}
-  .f-desc{font-size:calc(8.8pt * var(--esc));color:var(--p-muted);line-height:1.3;margin-top:.3mm;white-space:pre-line}
+  .folha .preco{color:var(--p-accent);font-size:calc(11.5pt * var(--esc) * var(--fi))}
+  .f-desc{font-size:calc(9.4pt * var(--esc) * var(--fi));color:var(--p-muted);line-height:1.3;margin-top:.3mm;white-space:pre-line}
   .f-thumb{position:relative;overflow:hidden;width:calc(15mm * var(--esc));height:calc(15mm * var(--esc));border-radius:1.6mm;flex:none}
   .f-thumb img{display:block;width:100%;height:100%;object-fit:cover}
   .f-colunas{display:flex;justify-content:flex-end;gap:2mm;padding-bottom:.6mm}
-  .f-colunas span,.f-col{width:calc(17mm * var(--esc));text-align:center}
-  .f-colunas span{font-size:calc(6.6pt * var(--esc));font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--p-muted);line-height:1.2}
+  .f-colunas span,.f-col{width:calc(17mm * var(--esc) * var(--fi));text-align:center}
+  .f-colunas span{font-size:calc(7pt * var(--esc) * var(--fi));font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--p-muted);line-height:1.2}
   .f-precos{display:flex;gap:2mm;align-self:center}
 
   .f-promo{background:var(--p-olive);color:var(--p-olive-text);border-radius:3mm;padding:4mm 5mm 3mm}
-  .f-promo .f-grupo-titulo{font-size:calc(18pt * var(--esc));border-color:rgba(255,255,255,.25)}
+  .f-promo .f-grupo-titulo{font-size:calc(19pt * var(--esc) * var(--fi));border-color:rgba(255,255,255,.25)}
   .f-promo .f-grupo-titulo,.f-promo .f-nome,.f-promo .preco{color:var(--p-olive-text)}
   .f-promo .f-desc,.f-promo .f-grupo-nota{color:rgba(255,255,255,.8)}
   .f-promo .f-leader{border-color:rgba(255,255,255,.45)}
@@ -350,10 +350,10 @@
   .f-destaque{display:grid;grid-template-columns:1fr 1fr;border-radius:3mm;overflow:hidden;background:var(--p-dest);min-height:calc(56mm * var(--esc))}
   .f-destaque.sem-foto{grid-template-columns:1fr}
   .f-dest-corpo{padding:5mm 5.5mm;display:flex;flex-direction:column;gap:2mm;justify-content:center}
-  .f-selo{align-self:flex-start;background:var(--p-accent);color:var(--p-bg);font-size:calc(6.5pt * var(--esc));letter-spacing:.2em;text-transform:uppercase;font-weight:700;padding:.8mm 2.6mm;border-radius:99px}
-  .f-dest-nome{font-family:var(--display);font-weight:400;font-size:calc(22pt * var(--esc));line-height:1.02;color:var(--p-dest-text);text-transform:uppercase}
-  .f-dest-desc{font-size:calc(9pt * var(--esc));color:var(--p-dest-muted);white-space:pre-line}
-  .f-destaque .preco{font-size:calc(17pt * var(--esc))}
+  .f-selo{align-self:flex-start;background:var(--p-accent);color:var(--p-bg);font-size:calc(6.8pt * var(--esc) * var(--fi));letter-spacing:.2em;text-transform:uppercase;font-weight:700;padding:.8mm 2.6mm;border-radius:99px}
+  .f-dest-nome{font-family:var(--display);font-weight:400;font-size:calc(22pt * var(--esc) * var(--fi));line-height:1.02;color:var(--p-dest-text);text-transform:uppercase}
+  .f-dest-desc{font-size:calc(9.6pt * var(--esc) * var(--fi));color:var(--p-dest-muted);white-space:pre-line}
+  .f-destaque .preco{font-size:calc(17pt * var(--esc) * var(--fi))}
 
   .f-foto{position:relative;margin:0;overflow:hidden;border-radius:3mm;background:var(--p-surface)}
   .f-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -1171,10 +1171,14 @@
     }
   }
 
+  // Tamanho da letra dos itens na impressão: média, grande (padrão) ou extra grande.
+  var LETRAS = { media: 1, grande: 1.15, extra: 1.3 };
+  function letraImpressao(){ return LETRAS[data.config.letraImpressao] || LETRAS.grande; }
+
   function renderPrint(){
     var info = data.info;
     var alvo = document.getElementById('print');
-    alvo.innerHTML = '<div class="folhas' + (data.config.temaImpressao === 'claro' ? ' claro' : '') + '"></div>';
+    alvo.innerHTML = '<div class="folhas' + (data.config.temaImpressao === 'claro' ? ' claro' : '') + '" style="--fi:' + letraImpressao() + '"></div>';
     var cont = alvo.firstElementChild;
     ajustarZoom();
 
@@ -1244,12 +1248,20 @@
     bar.className = 'print-bar efemero';
     bar.innerHTML = '<strong>Versão para impressão · <span id="print-total">folhas A4</span></strong>' +
       '<label>Fundo <select id="sel-tema"><option value="escuro">Escuro (como o atual)</option><option value="claro">Claro (economiza tinta)</option></select></label>' +
+      '<label>Letra dos itens <select id="sel-letra"><option value="media">Média</option><option value="grande">Grande</option><option value="extra">Extra grande</option></select></label>' +
       '<button type="button" class="btn primario" id="btn-imprimir">Imprimir / Salvar PDF</button>' +
       '<button type="button" class="btn" id="btn-voltar">Voltar ao cardápio digital</button>' +
       '<span class="print-dica">Na janela de impressão: papel A4, margens “Nenhuma”, escala 100% e marque “Gráficos de plano de fundo”.</span>';
     document.body.insertBefore(bar, document.body.firstChild);
     var sel = document.getElementById('sel-tema');
     sel.value = data.config.temaImpressao === 'claro' ? 'claro' : 'escuro';
+    var selL = document.getElementById('sel-letra');
+    selL.value = LETRAS[data.config.letraImpressao] ? data.config.letraImpressao : 'grande';
+    selL.addEventListener('change', function(){
+      data.config.letraImpressao = selL.value;
+      if (editando) salvar();
+      renderPrint();
+    });
     sel.addEventListener('change', function(){
       data.config.temaImpressao = sel.value;
       if (editando) salvar();
@@ -1621,6 +1633,7 @@
       try { localStorage.removeItem(LS_KEY); } catch(e){}
       data = clonar(ORIGINAL); data.config = data.config || { mostrarEspacosFoto: true };
       var st = document.getElementById('sel-tema'); if (st) st.value = data.config.temaImpressao === 'claro' ? 'claro' : 'escuro';
+      var sl = document.getElementById('sel-letra'); if (sl) sl.value = LETRAS[data.config.letraImpressao] ? data.config.letraImpressao : 'grande';
       document.getElementById('opt-vazios').checked = !!data.config.mostrarEspacosFoto;
       salvar(); rerender(); toast('Alterações descartadas');
     });
