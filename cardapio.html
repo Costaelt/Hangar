@@ -107,7 +107,7 @@
   /* grupos com fotos: cartões */
   .com-foto .itens{gap:12px}
   @media (min-width:760px){ .com-foto .itens{grid-template-columns:1fr 1fr;gap:14px 16px} }
-  .com-foto .item{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:12px;align-items:center}
+  .com-foto .item{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:14px;align-items:center}
   .com-foto .item:last-child{border-bottom:1px solid var(--line)}
 
   /* grupos com mais de um preço (chopp) */
@@ -137,6 +137,28 @@
   /* ---------- Espaços para fotos ---------- */
   .foto{position:relative;margin:0;overflow:hidden;background:var(--surface-2);border-radius:var(--radius)}
   .foto img{display:block;width:100%;height:100%;object-fit:cover}
+  /* fotos com bordas que se dissolvem no fundo (em vez de retângulo reto) */
+  .foto-quadro{position:absolute;inset:0;overflow:hidden;display:block}
+  .foto.tem{background:transparent;border-radius:0}
+  .foto.banner.tem .foto-quadro{
+    -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 42%,rgba(0,0,0,.6) 70%,transparent 100%);
+    mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 42%,rgba(0,0,0,.6) 70%,transparent 100%)}
+  .destaque-foto.tem .foto-quadro,.panoramico .foto.tem .foto-quadro{
+    -webkit-mask-image:linear-gradient(to bottom,#000 50%,transparent 100%);mask-image:linear-gradient(to bottom,#000 50%,transparent 100%)}
+  @media (min-width:760px){
+    .destaque-foto.tem .foto-quadro,.panoramico .foto.tem .foto-quadro{
+      -webkit-mask-image:linear-gradient(to right,#000 45%,transparent 100%);mask-image:linear-gradient(to right,#000 45%,transparent 100%)}
+  }
+  /* foto do produto como fundo do cartão, transparecendo atrás do texto */
+  .item.com-fundo{position:relative;overflow:hidden;min-height:104px}
+  .foto.item-fundo{position:absolute;top:0;right:0;bottom:0;width:62%;margin:0;z-index:0;pointer-events:none;opacity:.9}
+  .foto.item-fundo .foto-quadro{
+    -webkit-mask-image:radial-gradient(ellipse 95% 120% at 85% 50%,#000 25%,rgba(0,0,0,.5) 60%,transparent 100%);
+    mask-image:radial-gradient(ellipse 95% 120% at 85% 50%,#000 25%,rgba(0,0,0,.5) 60%,transparent 100%)}
+  .item.com-fundo > :not(.item-fundo){position:relative;z-index:1}
+  .item.com-fundo .item-nome,.item.com-fundo .preco,.item.com-fundo .item-desc{text-shadow:0 1px 3px rgba(0,0,0,.9),0 0 10px rgba(0,0,0,.6)}
+  .item.com-fundo .item-desc{color:#cfccb4}
+  .item.com-fundo .leader{border-color:rgba(244,240,212,.35)}
   .foto.vazia{border:1.5px dashed rgba(244,240,212,.22);
     background:repeating-linear-gradient(135deg,rgba(244,240,212,.025) 0 12px,transparent 12px 24px),var(--surface-2)}
   .foto-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:rgba(244,240,212,.38);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;text-align:center;padding:8px}
@@ -321,6 +343,29 @@
 
   .f-foto{position:relative;margin:0;overflow:hidden;border-radius:3mm;background:var(--p-surface)}
   .f-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .f-quadro{position:absolute;inset:0;overflow:hidden;display:block}
+  .f-foto.tem{background:transparent}
+  .f-banner.tem{border-radius:0;margin-left:-14mm;margin-right:-14mm}
+  .f-banner.tem .f-quadro{
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%);
+    mask-image:linear-gradient(to bottom,transparent 0,#000 30%,#000 70%,transparent 100%)}
+  /* foto no pé da página: vai até a borda do papel e some suavemente para cima */
+  .f-banner.f-fim.tem{margin-bottom:-17mm}
+  .f-banner.f-fim.tem .f-quadro{
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.55) 22%,#000 48%);
+    mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.55) 22%,#000 48%)}
+  .f-dest-foto.tem .f-quadro{
+    -webkit-mask-image:linear-gradient(to right,#000 45%,transparent 100%);mask-image:linear-gradient(to right,#000 45%,transparent 100%)}
+  .f-capa-foto .f-quadro{border-radius:50%}
+  .f-pe{text-shadow:0 0 4px var(--p-bg)}
+  /* foto do produto atrás da linha do item */
+  .f-item.com-fundo{position:relative;min-height:calc(15mm * var(--esc))}
+  .f-fundo{position:absolute;top:-2mm;bottom:-2mm;right:calc(11mm * var(--esc));width:50%;overflow:hidden;z-index:0;opacity:.9;
+    -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 30%,rgba(0,0,0,.5) 65%,transparent 100%);
+    mask-image:radial-gradient(ellipse 50% 50% at 50% 50%,#000 30%,rgba(0,0,0,.5) 65%,transparent 100%)}
+  .f-fundo img{width:100%;height:100%;object-fit:cover;display:block}
+  .f-item.com-fundo > :not(.f-fundo){position:relative;z-index:1}
+  .f-item.com-fundo .f-nome,.f-item.com-fundo .preco,.f-item.com-fundo .f-desc{text-shadow:0 0 3px var(--p-bg),0 0 6px var(--p-bg)}
   .f-foto.vazia{border:1.3px dashed var(--p-line2);background:repeating-linear-gradient(135deg,rgba(128,128,110,.08) 0 3mm,transparent 3mm 6mm),var(--p-surface)}
   .f-foto .foto-ph{color:var(--p-muted)}
   .f-banner{flex:1 1 0;min-height:60mm;margin-top:calc(6mm * var(--esc))}
@@ -789,7 +834,7 @@
       (editando ? (vazio ? ' data-acao="foto-up" data-path="' + path + '" title="Clique para escolher uma foto"'
                          : ' data-acao="foto-ajustar" data-path="' + path + '" title="Clique para ajustar zoom e enquadramento"') : '') + '>' +
       (vazio ? '<span class="foto-ph">' + ICON.cam + '<em>' + (editando ? 'adicionar foto' : 'foto em breve') + '</em></span>'
-             : '<img src="' + esc(src) + '" alt="' + esc(alt || '') + '" loading="lazy"' + estiloImg(path) + '>') +
+             : '<span class="foto-quadro"><img src="' + esc(src) + '" alt="' + esc(alt || '') + '" loading="lazy"' + estiloImg(path) + '></span>') +
       (editando && cls.indexOf('thumb') === -1 ?
         '<div class="ctrl foto-ctrl">' + (vazio ? '' : '<button type="button" class="mini" data-acao="foto-ajustar" data-path="' + path + '">Zoom / enquadrar</button>') +
         '<button type="button" class="mini" data-acao="foto-up" data-path="' + path + '">' + (vazio ? 'Enviar foto' : 'Trocar foto') + '</button>' +
@@ -812,8 +857,10 @@
 
   function renderItem(it, ip, g){
     var multi = Array.isArray(g.colunas) && g.colunas.length > 0;
-    var html = '<article class="item' + (it.oculto ? ' is-oculto' : '') + '">';
-    if (g.comFoto) html += slotFoto(ip + '.foto', 'thumb', it.nome);
+    var fundo = g.comFoto && it.foto;
+    var html = '<article class="item' + (it.oculto ? ' is-oculto' : '') + (fundo ? ' com-fundo' : '') + '">';
+    if (fundo) html += '<figure class="foto item-fundo tem" data-path="' + ip + '.foto" aria-hidden="true"><span class="foto-quadro">' +
+      '<img src="' + esc(it.foto) + '" alt="" loading="lazy"' + estiloImg(ip + '.foto') + '></span></figure>';
     html += '<div class="item-corpo"><div class="item-linha">' + ed(ip + '.nome', 'h4', 'item-nome', 'texto', 'Nome do item');
     if (!multi) html += '<span class="leader" aria-hidden="true"></span>' + preco(ip + '.preco');
     html += '</div>' + opt(ip + '.desc', 'p', 'item-desc', 'multi', 'Descrição (opcional)') + '</div>';
@@ -981,7 +1028,7 @@
     return '<figure class="f-foto ' + cls + (src ? ' tem' : ' vazia') + '"' +
       (editando ? (src ? ' data-acao="foto-ajustar" data-path="' + path + '" title="Clique para ajustar zoom e enquadramento"'
                        : ' data-acao="foto-up" data-path="' + path + '" title="Clique para escolher uma foto"') : '') + '>' +
-      (src ? '<img src="' + esc(src) + '" alt="' + esc(alt || '') + '"' + estiloImg(path) + '>'
+      (src ? '<span class="f-quadro"><img src="' + esc(src) + '" alt="' + esc(alt || '') + '"' + estiloImg(path) + '></span>'
            : '<span class="foto-ph">' + ICON.cam + '<em>espaço para foto</em></span>') +
       '</figure>';
   }
@@ -989,8 +1036,8 @@
 
   function pItem(it, ip, g){
     var multi = Array.isArray(g.colunas) && g.colunas.length > 0;
-    var h = '<div class="f-item">';
-    if (it.foto) h += '<span class="f-thumb"><img src="' + esc(it.foto) + '" alt="' + esc(it.nome) + '"' + estiloImg(ip + '.foto') + '></span>';
+    var h = '<div class="f-item' + (it.foto ? ' com-fundo' : '') + '">';
+    if (it.foto) h += '<span class="f-fundo" aria-hidden="true"><img src="' + esc(it.foto) + '" alt=""' + estiloImg(ip + '.foto') + '></span>';
     h += '<div class="f-corpo"><div class="f-linha">' + ed(ip + '.nome', 'span', 'f-nome');
     if (!multi) h += '<span class="f-leader"></span>' + preco(ip + '.preco');
     h += '</div>' + optP(ip + '.desc', 'div', 'f-desc', 'multi') + '</div>';
@@ -1038,7 +1085,7 @@
       optP('info.slogan', 'p', 'bv-slogan', 'multi') +
       '<div class="bv-grid"><div><h3 class="f-grupo-titulo">Horário de funcionamento</h3><dl class="f-dl">' + pLinhas(info.horarios || [], 'info.horarios') + '</dl></div>' +
       '<div><h3 class="f-grupo-titulo">Serviços</h3><dl class="f-dl">' + pLinhas(info.servicos || [], 'info.servicos') + '</dl></div></div>' +
-      pSlot('info.boasVindasFoto', 'f-banner', info.marca) + '</div>' + pe(n) + '</section>';
+      pSlot('info.boasVindasFoto', 'f-banner f-fim', info.marca) + '</div>' + pe(n) + '</section>';
     // 3. Uma página por seção do cardápio
     data.secoes.forEach(function(s, i){
       if (s.oculto) return;
@@ -1049,7 +1096,7 @@
         ed(p + '.titulo', 'h2', 'f-titulo') + optP(p + '.subtitulo', 'p', 'f-sub') +
         (hor ? '<p class="f-horario">' + ICON.clock + ed(p + '.horario', 'span', '') + '</p>' : '') + '</header>' +
         '<div class="f-grupos">' + s.grupos.map(function(g, j){ return pGrupo(g, p + '.grupos.' + j); }).join('') + '</div>' +
-        pSlot(p + '.foto', 'f-banner', s.titulo) + '</div>' + pe(n) + '</section>';
+        pSlot(p + '.foto', 'f-banner f-fim', s.titulo) + '</div>' + pe(n) + '</section>';
     });
     // 4. Voo panorâmico e contato
     n++;
