@@ -393,7 +393,9 @@
   /* boas-vindas / informações */
   .bv-in{text-align:center}
   .bv-titulo{font-size:calc(44pt * var(--esc))}
-  .bv-logo{margin:5mm auto 2mm;width:calc(118mm * var(--esc));max-width:100%}
+  .bv-logo{--logo:1;margin:5mm auto 2mm;width:calc(118mm * var(--esc) * var(--logo));max-width:100%}
+  .pg-ctrl input[type=range]{accent-color:var(--accent);width:180px}
+  .pg-ctrl output{min-width:42px;color:var(--muted)}
   .bv-logo img{display:block;width:100%;height:auto}
   .folhas.claro .bv-logo img{filter:invert(1)}  /* logo branco vira preto no fundo claro */
   body.modo-edicao .bv-logo[data-acao]{cursor:pointer}
@@ -1807,9 +1809,16 @@
       '<p class="capa-comp">' + ed('info.complemento', 'span', '') + '</p></div>' +
       pSlot('info.capaFoto', 'f-capa-foto', 'Logo ' + info.marca) + '</div></section>');
     // 2. Boas-vindas e horários
+    var tamLogo = Math.min(130, Math.max(30, +info.logoTamanho || 100));
+    if (editando && info.logo) {
+      addHTML(cont, '<div class="pg-ctrl"><strong>Boas-vindas</strong>' +
+        '<label>Tamanho do logotipo <input type="range" min="30" max="130" step="5" value="' + tamLogo + '" data-campo-logo aria-label="Tamanho do logotipo">' +
+        '<output>' + tamLogo + '%</output></label>' +
+        '<button type="button" class="mini" data-acao="foto-up" data-path="info.logo">Trocar logotipo</button></div>');
+    }
     addHTML(cont, '<section class="folha f-fixa"><div class="folha-in bv-in">' +
       '<span class="f-etapa">Bem-vindo ao</span>' +
-      (info.logo ? '<figure class="bv-logo"' + (editando ? ' data-acao="foto-up" data-path="info.logo" title="Clique para trocar o logotipo"' : '') + '>' +
+      (info.logo ? '<figure class="bv-logo" style="--logo:' + (tamLogo / 100) + '"' + (editando ? ' data-acao="foto-up" data-path="info.logo" title="Clique para trocar o logotipo"' : '') + '>' +
                    '<img src="' + esc(info.logo) + '" alt="' + esc(info.marca) + '"></figure>'
                  : ed('info.marca', 'h2', 'f-titulo bv-titulo')) +
       optP('info.slogan', 'p', 'bv-slogan', 'multi') +
@@ -2232,8 +2241,22 @@
       e.preventDefault();
       acao(b.dataset.acao, b.dataset.path, b);
     });
+    // tamanho do logotipo: mostra na hora enquanto arrasta; salva ao soltar
+    app.addEventListener('input', function(e){
+      var el = e.target;
+      if (!el.hasAttribute || !el.hasAttribute('data-campo-logo')) return;
+      var out = el.parentNode.querySelector('output'); if (out) out.textContent = el.value + '%';
+      var fig = document.querySelector('#print .bv-logo'); if (fig) fig.style.setProperty('--logo', el.value / 100);
+    });
     app.addEventListener('change', function(e){
       var el = e.target;
+      if (el.hasAttribute && el.hasAttribute('data-campo-logo')) {
+        if (+el.value === 100) delete data.info.logoTamanho; else data.info.logoTamanho = +el.value;
+        var yl = window.scrollY;
+        salvar(); renderPrint();
+        window.scrollTo({ top: yl, behavior: 'instant' });
+        return;
+      }
       if (el.dataset && el.dataset.campo && el.dataset.sec != null) {
         var sec = data.secoes[+el.dataset.sec];
         var imp = sec.impressao || {};
