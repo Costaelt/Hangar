@@ -405,10 +405,27 @@
   .f-wa{font-weight:700;color:var(--p-accent);font-size:calc(11.5pt * var(--esc));letter-spacing:.1em}
   .f-fine{font-size:calc(7pt * var(--esc));color:var(--p-muted);letter-spacing:.04em;margin-top:2mm}
 
+  /* ajustes por seção na versão impressa (só aparecem na tela, no modo edição) */
+  .pg-ctrl{width:210mm;max-width:100%;box-sizing:border-box;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:-12px;
+    background:#232617;border:1px solid var(--olive-2);border-radius:10px;padding:10px 14px;font:13px var(--body);color:var(--cream)}
+  .pg-ctrl strong{margin-right:auto;font-size:14px}
+  .pg-ctrl label{display:inline-flex;gap:6px;align-items:center}
+  .pg-ctrl select{font:inherit;background:var(--surface-2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+  .pg-ctrl .mini{font-size:12px}
+  /* foto no topo da página */
+  .f-foto-topo{position:absolute;top:0;left:0;right:0;height:96mm;z-index:1;margin:0;border-radius:0}
+  .f-foto-topo.tem .f-quadro{-webkit-mask-image:linear-gradient(to bottom,#000 38%,rgba(0,0,0,.5) 68%,transparent 100%);mask-image:linear-gradient(to bottom,#000 38%,rgba(0,0,0,.5) 68%,transparent 100%)}
+  .f-foto-topo.vazia{border:0;border-bottom:1.3px dashed var(--p-line2)}
+  .folha-in.com-foto-topo{padding-top:66mm}
+  .com-foto-topo .f-head .f-etapa,.com-foto-topo .f-head .f-titulo,.com-foto-topo .f-head .f-sub{text-shadow:0 0 6px var(--p-bg),0 0 16px var(--p-bg)}
+  /* foto como fundo transparente da página inteira */
+  .f-foto-fundo{position:absolute;inset:0;z-index:1;margin:0;border-radius:0;opacity:.22;pointer-events:none}
+  .f-foto-fundo .f-quadro{-webkit-mask-image:radial-gradient(ellipse 80% 72% at 50% 55%,#000 35%,transparent 100%);mask-image:radial-gradient(ellipse 80% 72% at 50% 55%,#000 35%,transparent 100%)}
+
   @page{size:A4 portrait;margin:0}
   @media print{
     html,body{background:#fff!important;margin:0!important;padding:0!important}
-    #app,.barra,.ajuda,.toast,.print-bar{display:none!important}
+    #app,.barra,.ajuda,.toast,.print-bar,.pg-ctrl{display:none!important}
     #print{position:static!important;visibility:visible!important;padding:0!important;background:none!important}
     .folhas{display:block!important;zoom:1!important;gap:0!important}
     .folha{box-shadow:none!important;outline:0!important;height:296.8mm;break-after:page;page-break-after:always}
@@ -1673,14 +1690,38 @@
   function paginarSecao(cont, s, i){
     var p = 'secoes.' + i, hor = getPath(p + '.horario');
     var etapa = numeroEtapa(i);
-    var inn = novaFolha(cont);
+    var cfg = s.impressao || {};
+    var fi = LETRAS[cfg.letra] || null;          // null = usa o tamanho geral
+    var posFoto = POS_FOTO[cfg.foto] ? cfg.foto : 'fim';
+    var temFoto = !!getPath(p + '.foto');
+
+    if (editando) {
+      // barra de ajustes desta seção (não é impressa)
+      addHTML(cont, '<div class="pg-ctrl"><strong>Etapa ' + etapa + ' · ' + esc(s.titulo) + '</strong>' +
+        '<label>Letra <select data-sec="' + i + '" data-campo="letra">' + opcoes(NOMES_LETRA, cfg.letra || '', 'Igual às outras') + '</select></label>' +
+        '<label>Foto grande <select data-sec="' + i + '" data-campo="foto">' + opcoes(POS_FOTO, posFoto) + '</select></label>' +
+        '<button type="button" class="mini" data-acao="foto-up" data-path="' + p + '.foto">' + (temFoto ? 'Trocar foto' : 'Enviar foto') + '</button>' +
+        (temFoto ? '<button type="button" class="mini" data-acao="foto-ajustar" data-path="' + p + '.foto">Zoom / enquadrar</button>' : '') +
+        '</div>');
+    }
+    function folhaSecao(){
+      var inn = novaFolha(cont);
+      if (fi) inn.parentNode.style.setProperty('--fi', fi);
+      if (posFoto === 'fundo' && temFoto) inn.parentNode.insertAdjacentHTML('afterbegin', pSlot(p + '.foto', 'f-foto-fundo', ''));
+      return inn;
+    }
+    var inn = folhaSecao();
+    if (posFoto === 'topo') {
+      var topo = pSlot(p + '.foto', 'f-foto-topo', s.titulo);
+      if (topo) { inn.parentNode.insertAdjacentHTML('afterbegin', topo); inn.classList.add('com-foto-topo'); }
+    }
     addHTML(inn, '<header class="f-head"><span class="f-etapa">Etapa ' + etapa + '</span>' +
       ed(p + '.titulo', 'h2', 'f-titulo') + optP(p + '.subtitulo', 'p', 'f-sub') +
       (hor ? '<p class="f-horario">' + ICON.clock + ed(p + '.horario', 'span', '') + '</p>' : '') + '</header>');
     var area = addHTML(inn, '<div class="f-grupos"></div>');
 
     function continuar(){
-      inn = novaFolha(cont);
+      inn = folhaSecao();
       addHTML(inn, '<header class="f-head f-head-cont"><span class="f-etapa">Etapa ' + etapa + ' · continuação</span>' +
         '<h2 class="f-titulo f-titulo-cont">' + esc(s.titulo) + '</h2></header>');
       area = addHTML(inn, '<div class="f-grupos"></div>');
@@ -1722,8 +1763,8 @@
       });
     });
 
-    // Foto grande da seção: ocupa o espaço que sobrar no fim da última folha da seção.
-    var banner = pSlot(p + '.foto', 'f-banner f-fim', s.titulo);
+    // Foto grande da seção no fim: ocupa o espaço que sobrar no fim da última folha da seção.
+    var banner = posFoto === 'fim' ? pSlot(p + '.foto', 'f-banner f-fim', s.titulo) : '';
     if (banner) {
       var b = addHTML(inn, banner);
       if (!cabe(inn)) {
@@ -1735,7 +1776,13 @@
   }
 
   // Tamanho da letra dos itens na impressão: média, grande (padrão) ou extra grande.
-  var LETRAS = { media: 1, grande: 1.15, extra: 1.3 };
+  var LETRAS = { pequena: 0.9, media: 1, grande: 1.15, extra: 1.3 };
+  var NOMES_LETRA = { pequena: 'Pequena', media: 'Média', grande: 'Grande', extra: 'Extra grande' };
+  var POS_FOTO = { fim: 'No fim da página', topo: 'No topo da página', fundo: 'Fundo transparente', nenhuma: 'Não mostrar' };
+  function opcoes(mapa, atual, vazio){
+    return (vazio ? '<option value="">' + vazio + '</option>' : '') +
+      Object.keys(mapa).map(function(k){ return '<option value="' + k + '"' + (k === atual ? ' selected' : '') + '>' + mapa[k] + '</option>'; }).join('');
+  }
   function letraImpressao(){ return LETRAS[data.config.letraImpressao] || LETRAS.grande; }
 
   function renderPrint(){
@@ -1776,7 +1823,7 @@
     });
     ajustarFolhas();
     var tot = document.getElementById('print-total');
-    if (tot) tot.textContent = cont.children.length + ' folhas A4';
+    if (tot) tot.textContent = cont.querySelectorAll('.folha').length + ' folhas A4';
   }
 
   // Só as folhas fixas (capa, boas-vindas, contato) ajustam o tamanho da letra para preencher a página.
@@ -1811,7 +1858,7 @@
     bar.className = 'print-bar efemero';
     bar.innerHTML = '<strong>Versão para impressão · <span id="print-total">folhas A4</span></strong>' +
       '<label>Fundo <select id="sel-tema"><option value="escuro">Escuro (como o atual)</option><option value="claro">Claro (economiza tinta)</option></select></label>' +
-      '<label>Letra dos itens <select id="sel-letra"><option value="media">Média</option><option value="grande">Grande</option><option value="extra">Extra grande</option></select></label>' +
+      '<label>Letra dos itens <select id="sel-letra">' + opcoes(NOMES_LETRA, '') + '</select></label>' +
       '<button type="button" class="btn primario" id="btn-imprimir">Imprimir / Salvar PDF</button>' +
       '<button type="button" class="btn" id="btn-voltar">Voltar ao cardápio digital</button>' +
       '<span class="print-dica">Na janela de impressão: papel A4, margens “Nenhuma”, escala 100% e marque “Gráficos de plano de fundo”.</span>';
@@ -2175,6 +2222,17 @@
     });
     app.addEventListener('change', function(e){
       var el = e.target;
+      if (el.dataset && el.dataset.campo && el.dataset.sec != null) {
+        var sec = data.secoes[+el.dataset.sec];
+        var imp = sec.impressao || {};
+        if (el.value && !(el.dataset.campo === 'foto' && el.value === 'fim')) imp[el.dataset.campo] = el.value;
+        else delete imp[el.dataset.campo];
+        if (Object.keys(imp).length) sec.impressao = imp; else delete sec.impressao;
+        var y = window.scrollY;
+        salvar(); renderPrint();
+        window.scrollTo({ top: y, behavior: 'instant' });
+        return;
+      }
       if (el.dataset && el.dataset.acao === 'fotos-grupo') {
         var g = getPath(el.dataset.path);
         g.comFoto = el.checked;
