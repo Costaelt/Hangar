@@ -439,6 +439,8 @@
   .pg-ctrl label{display:inline-flex;gap:6px;align-items:center}
   .pg-ctrl select{font:inherit;background:var(--surface-2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
   .pg-ctrl .mini{font-size:12px}
+  .pg-sub{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding-top:8px;border-top:1px solid rgba(211,220,124,.2)}
+  .pg-sub > span{color:var(--accent);font-weight:700;margin-right:auto}
   /* foto no topo da página */
   .f-foto-topo{position:absolute;top:0;left:0;right:0;height:96mm;z-index:1;margin:0;border-radius:0}
   .f-foto-topo.tem .f-quadro{-webkit-mask-image:linear-gradient(to bottom,#000 38%,rgba(0,0,0,.5) 68%,transparent 100%);mask-image:linear-gradient(to bottom,#000 38%,rgba(0,0,0,.5) 68%,transparent 100%)}
@@ -1735,6 +1737,9 @@
     return el;
   }
 
+  // Intensidade (%) da foto de categoria usada como fundo da folha: quanto menor, mais clareada.
+  function intensidadeFundo(g){ var v = +g.fotoDepoisOpacidade; return v >= 5 && v <= 90 ? v : 34; }
+
   // Espaço livre (em px) no fim de uma folha já com conteúdo.
   function espacoLivre(inn){
     var ult = inn.lastElementChild;
@@ -1768,6 +1773,7 @@
         (temFoto ? '<button type="button" class="mini" data-acao="foto-ajustar" data-path="' + p + '.foto">Zoom / enquadrar</button>' : '') +
         '</div>');
     }
+    var barraSec = editando ? cont.lastElementChild : null;
     function folhaSecao(){
       var inn = novaFolha(cont);
       if (fi) inn.parentNode.style.setProperty('--fi', fi);
@@ -1858,8 +1864,17 @@
         var folhaAtual = inn.parentNode, velho = folhaAtual.querySelector(':scope > .f-foto-fundo');
         if (velho) velho.remove();
         folhaAtual.insertAdjacentHTML('afterbegin', pSlot(gp + '.fotoDepois', 'f-foto-fundo f-fundo-inteiro', g.titulo));
+        var op = intensidadeFundo(g);
+        if (folhaAtual.firstElementChild) folhaAtual.firstElementChild.style.opacity = op / 100;
         folhaAtual.classList.add('f-com-fundo');
         fechada = true;
+        if (barraSec) {
+          addHTML(barraSec, '<div class="pg-sub"><span>Foto de fundo da folha (' + esc(g.titulo || 'categoria') + ')</span>' +
+            '<label>Intensidade <input type="range" min="8" max="80" step="2" value="' + op + '" data-op-path="' + gp + '" aria-label="Intensidade da foto de fundo">' +
+            '<output>' + op + '%</output></label>' +
+            '<button type="button" class="mini" data-acao="foto-ajustar" data-path="' + gp + '.fotoDepois">Zoom / enquadrar</button>' +
+            '<button type="button" class="mini" data-acao="foto-up" data-path="' + gp + '.fotoDepois">Trocar foto</button></div>');
+        }
       } else if (g.fotoDepois) {
         var fd = addHTML(inn, pSlot(gp + '.fotoDepois', 'f-banner f-fim', g.titulo));
         if (cabe(inn)) fechada = true; else fd.remove();
@@ -2370,12 +2385,26 @@
     // tamanho do logotipo: mostra na hora enquanto arrasta; salva ao soltar
     app.addEventListener('input', function(e){
       var el = e.target;
+      if (el.hasAttribute && el.hasAttribute('data-op-path')) {
+        var o = el.parentNode.querySelector('output'); if (o) o.textContent = el.value + '%';
+        var ff = document.querySelector('#print figure.f-fundo-inteiro[data-path="' + el.getAttribute('data-op-path') + '.fotoDepois"]');
+        if (ff) ff.style.opacity = el.value / 100;
+        return;
+      }
       if (!el.hasAttribute || !el.hasAttribute('data-campo-logo')) return;
       var out = el.parentNode.querySelector('output'); if (out) out.textContent = el.value + '%';
       var fig = document.querySelector('#print .bv-logo'); if (fig) fig.style.setProperty('--logo', el.value / 100);
     });
     app.addEventListener('change', function(e){
       var el = e.target;
+      if (el.hasAttribute && el.hasAttribute('data-op-path')) {
+        var gg = getPath(el.getAttribute('data-op-path'));
+        if (+el.value === 34) delete gg.fotoDepoisOpacidade; else gg.fotoDepoisOpacidade = +el.value;
+        var yo = window.scrollY;
+        salvar(); renderPrint();
+        window.scrollTo({ top: yo, behavior: 'instant' });
+        return;
+      }
       if (el.hasAttribute && el.hasAttribute('data-campo-logo')) {
         if (+el.value === 100) delete data.info.logoTamanho; else data.info.logoTamanho = +el.value;
         var yl = window.scrollY;
