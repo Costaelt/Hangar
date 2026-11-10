@@ -1373,11 +1373,12 @@
     (src.secoes || []).forEach(function(ss){
       var ds = (dst.secoes || []).filter(function(x){ return x.id === ss.id; })[0];
       if (!ds) return;
-      if (ss.impressao && !ds.impressao) ds.impressao = JSON.parse(JSON.stringify(ss.impressao));
+      // só traz o que o rascunho nunca teve (se a pessoa mudou ou removeu, a escolha dela fica)
+      if (ss.impressao && !('impressao' in ds)) ds.impressao = JSON.parse(JSON.stringify(ss.impressao));
       (ss.grupos || []).forEach(function(sg){
         var dg = (ds.grupos || []).filter(function(x){ return (x.titulo || '') === (sg.titulo || ''); })[0];
-        if (!dg) return;
-        CAMPOS.forEach(function(k){ if (sg[k] != null && dg[k] == null) dg[k] = JSON.parse(JSON.stringify(sg[k])); });
+        if (!dg || !sg.fotoDepois || ('fotoDepois' in dg)) return;
+        CAMPOS.forEach(function(k){ if (sg[k] != null) dg[k] = JSON.parse(JSON.stringify(sg[k])); });
       });
     });
   }
@@ -1388,7 +1389,7 @@
   if (editando) {
     var rasc = lerRascunho();
     if (rasc && rasc.data) {
-      if (rasc.base === BASE) data = rasc.data;
+      if (rasc.base === BASE) { data = rasc.data; trazerNovidades(data, ORIGINAL); }
       else if (JSON.stringify(rasc.data) !== JSON.stringify(ORIGINAL) &&
                confirm('Encontramos alterações do cardápio salvas neste navegador' +
                  (rasc.em ? ' em ' + new Date(rasc.em).toLocaleString('pt-BR') : '') +
@@ -2442,7 +2443,7 @@
         var imp = sec.impressao || {};
         if (el.value && !(el.dataset.campo === 'foto' && el.value === 'fim')) imp[el.dataset.campo] = el.value;
         else delete imp[el.dataset.campo];
-        if (Object.keys(imp).length) sec.impressao = imp; else delete sec.impressao;
+        sec.impressao = imp;
         var y = window.scrollY;
         salvar(); renderPrint();
         window.scrollTo({ top: y, behavior: 'instant' });
