@@ -388,6 +388,13 @@
   .capa-marca{font-size:12pt;letter-spacing:.42em;text-transform:uppercase;color:var(--p-accent);font-weight:700}
   .capa-titulo{font-family:var(--display);font-weight:400;font-size:74pt;line-height:.95;color:var(--p-cream);text-transform:uppercase;margin-top:3mm}
   .capa-comp{font-size:10pt;letter-spacing:.38em;text-transform:uppercase;color:var(--p-muted);margin-top:4mm}
+  /* capa + boas-vindas na mesma folha */
+  .f-capa-bv::before,.f-capa-bv::after{width:62mm;height:62mm}
+  .f-capa-bv .folha-in{justify-content:flex-start;align-items:stretch;gap:0;padding-top:15mm}
+  .f-capa-bv.sem-foto .folha-in{justify-content:center;padding-top:14mm}
+  .f-capa-bv .capa-comp{font-size:calc(9pt * var(--esc));margin-top:1mm}
+  .f-capa-bv .bv-plano{font-size:calc(44pt * var(--esc));margin-top:calc(6mm * var(--esc))}
+  .f-capa-bv .bv-slogan{margin-top:calc(3mm * var(--esc))}
   .f-capa-foto{width:80mm;height:80mm;border-radius:50%;flex:none}
 
   /* boas-vindas / informações */
@@ -1803,28 +1810,26 @@
     var cont = alvo.firstElementChild;
     ajustarZoom();
 
-    // 1. Capa
-    addHTML(cont, '<section class="folha f-capa f-fixa"><div class="folha-in">' +
-      '<div><p class="capa-marca">' + ed('info.marca', 'span', '') + '</p>' + ed('info.titulo', 'h1', 'capa-titulo') +
-      '<p class="capa-comp">' + ed('info.complemento', 'span', '') + '</p></div>' +
-      pSlot('info.capaFoto', 'f-capa-foto', 'Logo ' + info.marca) + '</div></section>');
-    // 2. Boas-vindas e horários
+    // 1. Capa + boas-vindas e horários (uma folha só)
     var tamLogo = Math.min(130, Math.max(30, +info.logoTamanho || 100));
     if (editando && info.logo) {
-      addHTML(cont, '<div class="pg-ctrl"><strong>Boas-vindas</strong>' +
+      addHTML(cont, '<div class="pg-ctrl"><strong>Capa e boas-vindas</strong>' +
         '<label>Tamanho do logotipo <input type="range" min="30" max="130" step="5" value="' + tamLogo + '" data-campo-logo aria-label="Tamanho do logotipo">' +
         '<output>' + tamLogo + '%</output></label>' +
         '<button type="button" class="mini" data-acao="foto-up" data-path="info.logo">Trocar logotipo</button></div>');
     }
-    addHTML(cont, '<section class="folha f-fixa"><div class="folha-in bv-in">' +
+    var bvFoto = pSlot('info.boasVindasFoto', 'f-banner f-fim', info.marca);
+    addHTML(cont, '<section class="folha f-capa f-capa-bv f-fixa' + (bvFoto ? '' : ' sem-foto') + '"><div class="folha-in bv-in">' +
       '<span class="f-etapa">Bem-vindo ao</span>' +
       (info.logo ? '<figure class="bv-logo" style="--logo:' + (tamLogo / 100) + '"' + (editando ? ' data-acao="foto-up" data-path="info.logo" title="Clique para trocar o logotipo"' : '') + '>' +
                    '<img src="' + esc(info.logo) + '" alt="' + esc(info.marca) + '"></figure>'
                  : ed('info.marca', 'h2', 'f-titulo bv-titulo')) +
+      optP('info.complemento', 'p', 'capa-comp') +
+      ed('info.titulo', 'h1', 'capa-titulo bv-plano') +
       optP('info.slogan', 'p', 'bv-slogan', 'multi') +
       '<div class="bv-grid"><div><h3 class="f-grupo-titulo">Horário de funcionamento</h3><dl class="f-dl">' + pLinhas(info.horarios || [], 'info.horarios') + '</dl></div>' +
       '<div><h3 class="f-grupo-titulo">Serviços</h3><dl class="f-dl">' + pLinhas(info.servicos || [], 'info.servicos') + '</dl></div></div>' +
-      pSlot('info.boasVindasFoto', 'f-banner f-fim', info.marca) + '</div></section>');
+      bvFoto + '</div></section>');
     // 3. Seções do cardápio (quantas folhas forem necessárias)
     data.secoes.forEach(function(s, i){ if (!s.oculto) paginarSecao(cont, s, i); });
     // 4. Voo panorâmico e contato
@@ -1850,7 +1855,7 @@
   // Só as folhas fixas (capa, boas-vindas, contato) ajustam o tamanho da letra para preencher a página.
   function ajustarFolhas(){
     document.querySelectorAll('#print .folha.f-fixa').forEach(function(f){
-      var inn = f.querySelector('.folha-in'), e = f.classList.contains('f-capa') ? 1 : 1.25;
+      var inn = f.querySelector('.folha-in'), e = f.classList.contains('f-capa') ? 1.15 : 1.25;
       f.style.setProperty('--esc', e);
       f.classList.remove('estourou');
       while (inn.scrollHeight > inn.clientHeight + 1 && e > 0.62) {
