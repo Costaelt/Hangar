@@ -316,6 +316,15 @@
   .f-item{display:flex;gap:2.5mm;align-items:center;padding:calc(2.4mm * var(--fi)) 0;break-inside:avoid;border-bottom:1px solid var(--p-line)}
   .f-cont-tag{font-family:var(--body);font-size:7.5pt;letter-spacing:.18em;text-transform:uppercase;color:var(--p-muted);vertical-align:middle;margin-left:2mm}
   .f-head-cont{margin-bottom:5mm}
+  .f-head-junto{margin-top:5mm;padding-top:5mm;border-top:1px solid var(--p-line2)}
+  /* folha com duas seções: títulos e espaços mais compactos */
+  .f-junta .f-head{margin-bottom:3.5mm}
+  .f-junta .f-titulo{font-size:30pt}
+  .f-junta .f-grupos{gap:calc(7mm * var(--fi))}
+  .f-junta .f-lista-2 .f-itens{columns:3;column-gap:7mm}
+  .f-junta .f-com-foto .f-itens{grid-template-columns:1fr 1fr 1fr}
+  .f-junta .folha-in{padding-top:11mm}
+  .pg-nota{font-size:12px;color:var(--accent)}
   .f-titulo-cont{font-size:22pt}
   /* cartões com foto ao fundo, como no cardápio digital */
   .f-com-foto .f-itens{display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin-top:1.5mm}
@@ -719,6 +728,9 @@
         "x": 50,
         "y": 55.6,
         "z": 1
+      },
+      "impressao": {
+        "juntar": "sim"
       }
     },
     {
@@ -1705,11 +1717,25 @@
     return el;
   }
 
-  function paginarSecao(cont, s, i){
+  // Espaço livre (em px) no fim de uma folha já com conteúdo.
+  function espacoLivre(inn){
+    var ult = inn.lastElementChild;
+    if (!ult) return inn.clientHeight;
+    var pb = parseFloat(getComputedStyle(inn).paddingBottom) || 0;
+    return inn.clientHeight - pb - (ult.offsetTop + ult.offsetHeight);
+  }
+  function proximaSecao(i){
+    for (var k = i + 1; k < data.secoes.length; k++) if (!data.secoes[k].oculto) return data.secoes[k];
+    return null;
+  }
+  var JUNTAR = { '': 'Começar em folha nova', sim: 'Na mesma folha da seção anterior' };
+
+  function paginarSecao(cont, s, i, ctx){
+    ctx = ctx || {};
     var p = 'secoes.' + i, hor = getPath(p + '.horario');
     var etapa = numeroEtapa(i);
     var cfg = s.impressao || {};
-    var fi = LETRAS[cfg.letra] || null;          // null = usa o tamanho geral
+    var fi = (ctx.auto && ctx.auto[i]) || LETRAS[cfg.letra] || null;   // null = usa o tamanho geral
     var posFoto = POS_FOTO[cfg.foto] ? cfg.foto : 'fim';
     var temFoto = !!getPath(p + '.foto');
 
@@ -1718,6 +1744,8 @@
       addHTML(cont, '<div class="pg-ctrl"><strong>Etapa ' + etapa + ' · ' + esc(s.titulo) + '</strong>' +
         '<label>Letra <select data-sec="' + i + '" data-campo="letra">' + opcoes(NOMES_LETRA, cfg.letra || '', 'Igual às outras') + '</select></label>' +
         '<label>Foto grande <select data-sec="' + i + '" data-campo="foto">' + opcoes(POS_FOTO, posFoto) + '</select></label>' +
+        (ctx.primeira ? '' : '<label>Início <select data-sec="' + i + '" data-campo="juntar">' + opcoes(JUNTAR, cfg.juntar || '') + '</select></label>') +
+        (ctx.auto && ctx.auto[i] ? '<span class="pg-nota">letra reduzida para ' + Math.round(ctx.auto[i] / baseFi(i) * 100) + '% para caber na folha</span>' : '') +
         '<button type="button" class="mini" data-acao="foto-up" data-path="' + p + '.foto">' + (temFoto ? 'Trocar foto' : 'Enviar foto') + '</button>' +
         (temFoto ? '<button type="button" class="mini" data-acao="foto-ajustar" data-path="' + p + '.foto">Zoom / enquadrar</button>' : '') +
         '</div>');
@@ -1728,17 +1756,33 @@
       if (posFoto === 'fundo' && temFoto) inn.parentNode.insertAdjacentHTML('afterbegin', pSlot(p + '.foto', 'f-foto-fundo', ''));
       return inn;
     }
-    var inn = folhaSecao();
-    if (posFoto === 'topo') {
-      var topo = pSlot(p + '.foto', 'f-foto-topo', s.titulo);
-      if (topo) { inn.parentNode.insertAdjacentHTML('afterbegin', topo); inn.classList.add('com-foto-topo'); }
-    }
-    addHTML(inn, '<header class="f-head"><span class="f-etapa">Etapa ' + etapa + '</span>' +
+    var cabecalho = '<span class="f-etapa">Etapa ' + etapa + '</span>' +
       ed(p + '.titulo', 'h2', 'f-titulo') + optP(p + '.subtitulo', 'p', 'f-sub') +
-      (hor ? '<p class="f-horario">' + ICON.clock + ed(p + '.horario', 'span', '') + '</p>' : '') + '</header>');
+      (hor ? '<p class="f-horario">' + ICON.clock + ed(p + '.horario', 'span', '') + '</p>' : '');
+    var inn = null, juntou = false;
+    // "Na mesma folha da seção anterior": continua na última folha, se sobrar espaço suficiente
+    if (cfg.juntar === 'sim' && !ctx.primeira) {
+      var folhas = cont.querySelectorAll('.folha'), ultima = folhas[folhas.length - 1];
+      if (ultima && !ultima.classList.contains('f-fixa')) {
+        var ui = ultima.querySelector('.folha-in');
+        var h = addHTML(ui, '<header class="f-head f-head-junto">' + cabecalho + '</header>');
+        ultima.classList.add('f-junta');
+        if (cabe(ui) && espacoLivre(ui) >= 120) { inn = ui; juntou = true; }
+        else { h.remove(); ultima.classList.remove('f-junta'); ctx.transbordou.push([ctx.ultimaSec, i]); }
+      }
+    }
+    if (!inn) {
+      inn = folhaSecao();
+      if (posFoto === 'topo') {
+        var topo = pSlot(p + '.foto', 'f-foto-topo', s.titulo);
+        if (topo) { inn.parentNode.insertAdjacentHTML('afterbegin', topo); inn.classList.add('com-foto-topo'); }
+      }
+      addHTML(inn, '<header class="f-head">' + cabecalho + '</header>');
+    }
     var area = addHTML(inn, '<div class="f-grupos"></div>');
 
     function continuar(){
+      if (juntou) { ctx.transbordou.push([ctx.ultimaSec, i]); juntou = false; }
       inn = folhaSecao();
       addHTML(inn, '<header class="f-head f-head-cont"><span class="f-etapa">Etapa ' + etapa + ' · continuação</span>' +
         '<h2 class="f-titulo f-titulo-cont">' + esc(s.titulo) + '</h2></header>');
@@ -1783,12 +1827,23 @@
 
     // Foto grande da seção no fim: ocupa o espaço que sobrar no fim da última folha da seção.
     var banner = posFoto === 'fim' ? pSlot(p + '.foto', 'f-banner f-fim', s.titulo) : '';
+    var propria = !!(banner && temFoto);
+    var prox = proximaSecao(i);
+    if (prox && prox.impressao && prox.impressao.juntar === 'sim') {
+      // a próxima seção vem nesta mesma folha: a foto fica guardada para o fim da folha
+      if (propria) ctx.fotoPendente = banner;
+      return;
+    }
+    if (!propria && ctx.fotoPendente) banner = ctx.fotoPendente;
+    var pendente = !propria && !!ctx.fotoPendente;
+    ctx.fotoPendente = null;
     if (banner) {
       var b = addHTML(inn, banner);
       if (!cabe(inn)) {
         b.remove();
-        // sem espaço: se houver foto de verdade, ela ganha meia folha própria em seguida
-        if (getPath(p + '.foto')) { continuar(); addHTML(inn, banner); }
+        // sem espaço: se houver foto de verdade desta seção, ela ganha meia folha própria em seguida
+        // (numa folha com duas seções juntas, a foto que não cabe fica de fora para não criar outra folha)
+        if (propria && !pendente && !juntou) { continuar(); addHTML(inn, banner); }
       }
     }
   }
@@ -1803,7 +1858,24 @@
   }
   function letraImpressao(){ return LETRAS[data.config.letraImpressao] || LETRAS.grande; }
 
+  // Monta as folhas; se uma seção marcada para "juntar" não couber na folha da anterior,
+  // diminui a letra das duas aos poucos (até 70%) e monta de novo.
+  function baseFi(k){ var c = data.secoes[k].impressao || {}; return LETRAS[c.letra] || letraImpressao(); }
   function renderPrint(){
+    var auto = {};
+    for (var volta = 0; volta < 12; volta++) {
+      var sobras = montarFolhas(auto), mudou = false;
+      sobras.forEach(function(par){
+        par.forEach(function(k){
+          if (k == null) return;
+          var atual = auto[k] || baseFi(k);
+          if (atual > 0.7 + 1e-9) { auto[k] = Math.max(0.7, Math.round((atual - 0.05) * 100) / 100); mudou = true; }
+        });
+      });
+      if (!mudou) break;
+    }
+  }
+  function montarFolhas(auto){
     var info = data.info;
     var alvo = document.getElementById('print');
     alvo.innerHTML = '<div class="folhas' + (data.config.temaImpressao === 'claro' ? ' claro' : '') + '" style="--fi:' + letraImpressao() + '"></div>';
@@ -1831,7 +1903,13 @@
       '<div><h3 class="f-grupo-titulo">Serviços</h3><dl class="f-dl">' + pLinhas(info.servicos || [], 'info.servicos') + '</dl></div></div>' +
       bvFoto + '</div></section>');
     // 3. Seções do cardápio (quantas folhas forem necessárias)
-    data.secoes.forEach(function(s, i){ if (!s.oculto) paginarSecao(cont, s, i); });
+    var ctxSec = { primeira: true, auto: auto || {}, transbordou: [], ultimaSec: null };
+    data.secoes.forEach(function(s, i){
+      if (s.oculto) return;
+      paginarSecao(cont, s, i, ctxSec);
+      ctxSec.primeira = false;
+      ctxSec.ultimaSec = i;
+    });
     // 4. Voo panorâmico e contato
     addHTML(cont, '<section class="folha f-fixa"><div class="folha-in">' +
       '<header class="f-head"><span class="f-etapa">Eleve sua experiência</span>' + ed('info.panoramico.titulo', 'h2', 'f-titulo') + '</header>' +
@@ -1850,6 +1928,7 @@
     ajustarFolhas();
     var tot = document.getElementById('print-total');
     if (tot) tot.textContent = cont.querySelectorAll('.folha').length + ' folhas A4';
+    return ctxSec.transbordou;
   }
 
   // Só as folhas fixas (capa, boas-vindas, contato) ajustam o tamanho da letra para preencher a página.
