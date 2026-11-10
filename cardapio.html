@@ -1366,6 +1366,21 @@
   /* ---------- Estado ---------- */
   var FONTE = document.getElementById('dados-cardapio').textContent;
   var ORIGINAL = JSON.parse(FONTE);
+  // Completa um rascunho antigo com o que o arquivo novo trouxe e o rascunho não tem
+  // (ex.: foto depois da categoria, ajustes de impressão das seções). Não apaga nada do rascunho.
+  function trazerNovidades(dst, src){
+    var CAMPOS = ['fotoDepois', 'fotoDepoisModo', 'fotoDepoisAjuste', 'fotoDepoisOpacidade'];
+    (src.secoes || []).forEach(function(ss){
+      var ds = (dst.secoes || []).filter(function(x){ return x.id === ss.id; })[0];
+      if (!ds) return;
+      if (ss.impressao && !ds.impressao) ds.impressao = JSON.parse(JSON.stringify(ss.impressao));
+      (ss.grupos || []).forEach(function(sg){
+        var dg = (ds.grupos || []).filter(function(x){ return (x.titulo || '') === (sg.titulo || ''); })[0];
+        if (!dg) return;
+        CAMPOS.forEach(function(k){ if (sg[k] != null && dg[k] == null) dg[k] = JSON.parse(JSON.stringify(sg[k])); });
+      });
+    });
+  }
   var BASE = hash(FONTE);
   var LS_KEY = 'hangar41-cardapio-rascunho';
   var editando = /[?&]editar\b/.test(location.search) || location.hash === '#editar';
@@ -1379,6 +1394,7 @@
                  (rasc.em ? ' em ' + new Date(rasc.em).toLocaleString('pt-BR') : '') +
                  ', feitas em outra versão do arquivo.\n\nOK = continuar com essas alterações\nCancelar = usar o conteúdo deste arquivo')) {
         data = rasc.data;
+        trazerNovidades(data, ORIGINAL);
       } else {
         // guarda uma cópia de segurança antes que o rascunho seja substituído
         try { localStorage.setItem(LS_KEY + '-anterior', JSON.stringify(rasc)); } catch(e){}
@@ -1537,6 +1553,9 @@
       (nivel !== 'secao' && (getPath(path) || {}).fotoDepois
         ? '<label class="cat-sel">Foto na impressão <select data-grupo="' + path + '" data-campo-grupo="fotoDepoisModo">' +
           '<option value="">depois da categoria</option><option value="fundo"' + ((getPath(path) || {}).fotoDepoisModo === 'fundo' ? ' selected' : '') + '>fundo da folha inteira</option></select></label>' : '') +
+      (nivel !== 'secao' && (getPath(path) || {}).fotoDepois && (getPath(path) || {}).fotoDepoisModo === 'fundo'
+        ? '<label class="cat-sel">Intensidade <input type="range" min="8" max="80" step="2" value="' + intensidadeFundo(getPath(path)) + '" data-op-path="' + path + '" aria-label="Intensidade da foto de fundo">' +
+          '<output>' + intensidadeFundo(getPath(path)) + '%</output></label>' : '') +
       (nivel !== 'secao' && !(getPath(path) || {}).fotoDepois
         ? '<button type="button" class="mini" data-acao="foto-up" data-path="' + path + '.fotoDepois" title="Foto que aparece logo depois desta categoria (na impressão, ocupa o resto da folha)">+ Foto depois da categoria</button>' : '') +
       '<button type="button" class="mini perigo" data-acao="del-cat" data-path="' + path + '">Excluir ' + nomeNivel + '</button>' +
