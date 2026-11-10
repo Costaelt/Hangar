@@ -480,7 +480,8 @@
   "config": {
     "mostrarEspacosFoto": false,
     "temaImpressao": "escuro",
-    "letraImpressao": "grande"
+    "letraImpressao": "grande",
+    "titulosTematicos": false
   },
   "info": {
     "marca": "Hangar 41",
@@ -1406,6 +1407,11 @@
   // rascunho de uma versão anterior: completa com novidades do arquivo (ex.: logotipo)
   data.info = data.info || {};
   Object.keys(ORIGINAL.info || {}).forEach(function(k){ if (!(k in data.info)) data.info[k] = clonar(ORIGINAL.info[k]); });
+  Object.keys(ORIGINAL.config || {}).forEach(function(k){ if (!(k in data.config)) data.config[k] = clonar(ORIGINAL.config[k]); });
+  // Nomes temáticos das seções (Primeiro Voo, Decolagem...) ou só o nome descritivo (Café da manhã, Entradas...)
+  function tematico(){ return data.config.titulosTematicos !== false; }
+  function nomeSecao(s){ return tematico() ? s.titulo : (s.subtitulo || s.titulo); }
+  function campoNome(i){ var s = data.secoes[i]; return 'secoes.' + i + (tematico() || !s.subtitulo ? '.titulo' : '.subtitulo'); }
   var observer = null;
   var alvoFoto = null;
 
@@ -1600,9 +1606,10 @@
     var hor = getPath(p + '.horario');
     return '<section class="secao' + (s.oculto ? ' is-oculto' : '') + '" id="' + esc(s.id) + '">' +
       '<header class="secao-head">' +
-        '<span class="etapa">' + (s.oculto ? 'Seção oculta' : 'Etapa ' + numeroEtapa(i)) + '</span>' +
-        ed(p + '.titulo', 'h2', 'secao-titulo', 'texto', 'Título') +
-        opt(p + '.subtitulo', 'p', 'secao-sub', 'texto', 'Subtítulo (opcional)') +
+        (s.oculto ? '<span class="etapa">Seção oculta</span>' : (tematico() ? '<span class="etapa">Etapa ' + numeroEtapa(i) + '</span>' : '')) +
+        (tematico()
+          ? ed(p + '.titulo', 'h2', 'secao-titulo', 'texto', 'Título') + opt(p + '.subtitulo', 'p', 'secao-sub', 'texto', 'Subtítulo (opcional)')
+          : ed(campoNome(i), 'h2', 'secao-titulo', 'texto', 'Título')) +
         (editando || hor ? '<p class="secao-horario">' + ICON.clock + ed(p + '.horario', 'span', '', 'texto', 'Horário (opcional)') + '</p>' : '') +
       (editando ? ctrlCategoria(p, 'secao', s.oculto) : '') +
       '</header>' +
@@ -1634,7 +1641,7 @@
       '</div></header>';
 
     html += '<nav class="nav" aria-label="Seções do cardápio"><div class="nav-inner">' +
-      data.secoes.filter(function(s){ return !s.oculto; }).map(function(s){ return '<a href="#' + esc(s.id) + '">' + esc(s.titulo) + '</a>'; }).join('') +
+      data.secoes.filter(function(s){ return !s.oculto; }).map(function(s){ return '<a href="#' + esc(s.id) + '">' + esc(nomeSecao(s)) + '</a>'; }).join('') +
       '<a href="#horarios">Horários</a></div></nav>';
 
     html += '<main>' + data.secoes.map(renderSecao).join('');
@@ -1800,8 +1807,9 @@
       if (posFoto === 'fundo' && temFoto) inn.parentNode.insertAdjacentHTML('afterbegin', pSlot(p + '.foto', 'f-foto-fundo', ''));
       return inn;
     }
-    var cabecalho = '<span class="f-etapa">Etapa ' + etapa + '</span>' +
-      ed(p + '.titulo', 'h2', 'f-titulo') + optP(p + '.subtitulo', 'p', 'f-sub') +
+    var cabecalho = (tematico()
+        ? '<span class="f-etapa">Etapa ' + etapa + '</span>' + ed(p + '.titulo', 'h2', 'f-titulo') + optP(p + '.subtitulo', 'p', 'f-sub')
+        : ed(campoNome(i), 'h2', 'f-titulo')) +
       (hor ? '<p class="f-horario">' + ICON.clock + ed(p + '.horario', 'span', '') + '</p>' : '');
     var inn = null, juntou = false;
     // "Na mesma folha da seção anterior": continua na última folha, se sobrar espaço suficiente
@@ -1828,8 +1836,8 @@
     function continuar(){
       if (juntou) { ctx.transbordou.push([ctx.ultimaSec, i]); juntou = false; }
       inn = folhaSecao();
-      addHTML(inn, '<header class="f-head f-head-cont"><span class="f-etapa">Etapa ' + etapa + ' · continuação</span>' +
-        '<h2 class="f-titulo f-titulo-cont">' + esc(s.titulo) + '</h2></header>');
+      addHTML(inn, '<header class="f-head f-head-cont"><span class="f-etapa">' + (tematico() ? 'Etapa ' + etapa + ' · ' : '') + 'continuação</span>' +
+        '<h2 class="f-titulo f-titulo-cont">' + esc(nomeSecao(s)) + '</h2></header>');
       area = addHTML(inn, '<div class="f-grupos"></div>');
     }
 
@@ -2109,12 +2117,12 @@
       // refaz a paginação quando o cursor sair das folhas (para não perder o campo em edição)
       setTimeout(function(){ var a = document.activeElement; if (!a || !a.closest || !a.closest('#print')) renderPrint(); }, 0);
     }
-    else { renderPrint(); if (/^secoes\.\d+\.titulo$/.test(path)) atualizarNav(); }
+    else { renderPrint(); if (/^secoes\.\d+\.(titulo|subtitulo)$/.test(path)) atualizarNav(); }
   }
   function atualizarNav(){
     data.secoes.forEach(function(s){
       var a = document.querySelector('.nav-inner a[href="#' + s.id + '"]');
-      if (a) a.textContent = s.titulo;
+      if (a) a.textContent = nomeSecao(s);
     });
   }
 
@@ -2355,6 +2363,7 @@
     barra.innerHTML = '<div class="barra-inner">' +
       '<div class="barra-info"><strong>Modo edição</strong><span id="status"></span></div>' +
       '<label><input type="checkbox" id="opt-vazios"' + (data.config.mostrarEspacosFoto ? ' checked' : '') + '> Mostrar espaços de foto vazios aos clientes</label>' +
+      '<label title="Primeiro Voo, Altitudes Geladas, Combustível, Decolagem, Voo, Voo Duplo..."><input type="checkbox" id="opt-tematicos"' + (tematico() ? ' checked' : '') + '> Nomes temáticos das seções</label>' +
       '<button type="button" class="btn" id="btn-preview">Pré-visualizar</button>' +
       '<button type="button" class="btn" id="btn-versao-impressa">Versão para impressão</button>' +
       '<button type="button" class="btn primario" id="btn-baixar">Baixar cardápio atualizado</button>' +
@@ -2459,6 +2468,9 @@
 
     document.getElementById('opt-vazios').addEventListener('change', function(e){
       data.config.mostrarEspacosFoto = e.target.checked; salvar(); rerender();
+    });
+    document.getElementById('opt-tematicos').addEventListener('change', function(e){
+      data.config.titulosTematicos = e.target.checked; salvar(); rerender();
     });
     document.getElementById('btn-preview').addEventListener('click', function(e){
       var on = document.body.classList.toggle('preview');
