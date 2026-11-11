@@ -218,6 +218,13 @@
   body.modo-edicao.preview .is-oculto{display:none}
 
   .item-ctrl{flex-basis:100%;gap:4px;flex-wrap:wrap;padding-top:6px}
+  .arrastar{cursor:grab;user-select:none;-webkit-user-select:none;letter-spacing:.02em}
+  .arrastar:active{cursor:grabbing}
+  .item.arrastando{opacity:.35}
+  .item.drop-antes{box-shadow:inset 0 3px 0 var(--accent)}
+  .item.drop-depois{box-shadow:inset 0 -3px 0 var(--accent)}
+  .grupo.drop-fim .itens{outline:2px dashed var(--accent);outline-offset:4px;border-radius:8px}
+  .item-ctrl select.mover{max-width:170px}
   .grupo-ctrl{gap:10px;align-items:center;margin-top:8px;font-size:.82rem;color:var(--muted)}
   .grupo-ctrl label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
   .cat-ctrl{flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:8px;padding:6px 8px;border-radius:9px;background:rgba(211,220,124,.06);border:1px solid rgba(211,220,124,.18)}
@@ -1599,10 +1606,26 @@
         (vazio ? '' : '<button type="button" class="mini perigo" data-acao="foto-del" data-path="' + path + '">Remover</button>') + '</div>' : '') +
       '</figure>';
   }
+  // lista de categorias para "Mover para…" (todas as seções)
+  function opcoesMover(ip){
+    var gpAtual = ip.replace(/\.itens\.\d+$/, '');
+    return '<option value="">Mover para…</option>' + data.secoes.map(function(s, si){
+      var ops = s.grupos.map(function(g, gj){
+        var gp = 'secoes.' + si + '.grupos.' + gj;
+        if ((g.tipo || 'lista') === 'destaque') return '';
+        return '<option value="' + gp + '"' + (gp === gpAtual ? ' disabled' : '') + '>' + esc(g.titulo || 'Sem título') + (gp === gpAtual ? ' (atual)' : '') + '</option>';
+      }).join('');
+      return ops ? '<optgroup label="' + esc(nomeSecao(s)) + '">' + ops + '</optgroup>' : '';
+    }).join('');
+  }
   function ctrlItem(ip, comFoto, temFoto, oculto){
     return '<div class="ctrl item-ctrl">' +
+      '<span class="mini arrastar" draggable="true" data-arrastar="' + ip + '" title="Segure e arraste para outra posição (também para outra categoria)">⠿ Arrastar</span>' +
+      '<button type="button" class="mini" data-acao="topo" data-path="' + ip + '" title="Primeiro da categoria">⤒</button>' +
       '<button type="button" class="mini" data-acao="up" data-path="' + ip + '" title="Mover para cima">↑</button>' +
       '<button type="button" class="mini" data-acao="down" data-path="' + ip + '" title="Mover para baixo">↓</button>' +
+      '<button type="button" class="mini" data-acao="fim" data-path="' + ip + '" title="Último da categoria">⤓</button>' +
+      '<select class="mini mover" data-mover="' + ip + '" aria-label="Mover para outra categoria">' + opcoesMover(ip) + '</select>' +
       '<button type="button" class="mini" data-acao="ocultar" data-path="' + ip + '">' + (oculto ? 'Mostrar no cardápio' : 'Ocultar (em falta)') + '</button>' +
       (comFoto ? (temFoto ? '<button type="button" class="mini" data-acao="foto-ajustar" data-path="' + ip + '.foto">Zoom / enquadrar</button>' : '') +
                  '<button type="button" class="mini" data-acao="foto-up" data-path="' + ip + '.foto">' + (temFoto ? 'Trocar foto' : 'Enviar foto') + '</button>' +
@@ -1617,7 +1640,7 @@
   function renderItem(it, ip, g){
     var multi = Array.isArray(g.colunas) && g.colunas.length > 0;
     var fundo = g.comFoto && it.foto;
-    var html = '<article class="item' + (it.oculto ? ' is-oculto' : '') + (fundo ? ' com-fundo' : '') + '">';
+    var html = '<article class="item' + (it.oculto ? ' is-oculto' : '') + (fundo ? ' com-fundo' : '') + '" data-ip="' + ip + '">';
     if (fundo) html += '<figure class="foto item-fundo tem" data-path="' + ip + '.foto" aria-hidden="true"><span class="foto-quadro">' +
       '<img src="' + esc(it.foto) + '" alt="" loading="lazy"' + estiloImg(ip + '.foto') + '></span></figure>';
     html += '<div class="item-corpo"><div class="item-linha">' + ed(ip + '.nome', 'h4', 'item-nome', 'texto', 'Nome do item') + selosHTML(it, ip, false);
@@ -1669,7 +1692,7 @@
     var largo = g.comFoto || g.largo || tipo === 'destaque';
     var visiveis = g.itens.map(function(it, k){ return { it: it, k: k }; }).filter(function(x){ return editando || !x.it.oculto; });
     if (!editando && (g.oculto || !visiveis.length)) return '';
-    var html = '<div class="grupo grupo-' + tipo + (g.comFoto ? ' com-foto' : '') + (largo ? ' largo' : '') + (g.oculto ? ' is-oculto' : '') + '">';
+    var html = '<div class="grupo grupo-' + tipo + (g.comFoto ? ' com-foto' : '') + (largo ? ' largo' : '') + (g.oculto ? ' is-oculto' : '') + '"' + (tipo !== 'destaque' ? ' data-gp="' + gp + '"' : '') + '>';
     if (editando) html += ctrlCategoria(gp, 'grupo', g.oculto);
     if (tipo === 'destaque') {
       html += visiveis.map(function(x){ return renderDestaque(x.it, gp + '.itens.' + x.k, gp); }).join('');
@@ -2293,6 +2316,12 @@
         ref = pai(path); getPath(ref.lista).splice(ref.idx, 1);
         salvar(); rerender(); toast('Item excluído');
         break;
+      case 'topo': case 'fim':
+        ref = pai(path);
+        var listaTF = getPath(ref.lista), itTF = listaTF.splice(ref.idx, 1)[0];
+        if (nome === 'topo') listaTF.unshift(itTF); else listaTF.push(itTF);
+        salvar(); rerender();
+        break;
       case 'up': case 'down':
         ref = pai(path);
         var lista = getPath(ref.lista), j = ref.idx + (nome === 'up' ? -1 : 1);
@@ -2453,6 +2482,22 @@
     m.querySelector('[data-a="salvar"]').focus();
   }
 
+  // Move um item para outra posição (na mesma categoria ou em outra). idx = posição final; null = fim.
+  function moverItem(ipOrigem, gpDestino, idx){
+    var ref = pai(ipOrigem);
+    var listaO = getPath(ref.lista), gD = getPath(gpDestino);
+    if (!listaO || !gD || !gD.itens) return;
+    var it = listaO.splice(ref.idx, 1)[0];
+    if (ref.lista === gpDestino + '.itens' && idx != null && ref.idx < idx) idx--;
+    // ajusta o formato do preço (categorias com colunas, como o chopp Pint / Half-pint)
+    var multi = Array.isArray(gD.colunas) && gD.colunas.length > 0;
+    if (multi && !Array.isArray(it.precos)) { it.precos = gD.colunas.map(function(c, ci){ return ci === 0 ? (it.preco || '') : ''; }); delete it.preco; }
+    else if (!multi && Array.isArray(it.precos)) { it.preco = it.precos[0] || ''; delete it.precos; }
+    if (idx == null || idx > gD.itens.length) gD.itens.push(it); else gD.itens.splice(Math.max(0, idx), 0, it);
+    salvar(); rerender();
+    toast(ref.lista === gpDestino + '.itens' ? 'Posição alterada' : 'Item movido para “' + (gD.titulo || 'categoria') + '”');
+  }
+
   function exportarHTML(){
     var doc = document.documentElement.cloneNode(true);
     doc.querySelector('#app').innerHTML = '';
@@ -2571,6 +2616,10 @@
         window.scrollTo({ top: yl, behavior: 'instant' });
         return;
       }
+      if (el.dataset && el.dataset.mover) {
+        if (el.value) moverItem(el.dataset.mover, el.value, null);
+        return;
+      }
       if (el.dataset && el.dataset.seloAdd) {
         var itA = getPath(el.dataset.seloAdd);
         if (el.value && SELOS[el.value]) {
@@ -2607,6 +2656,49 @@
     document.getElementById('opt-vazios').addEventListener('change', function(e){
       data.config.mostrarEspacosFoto = e.target.checked; salvar(); rerender();
     });
+    // arrastar e soltar itens (computador)
+    var arrastado = null;
+    function limparMarcas(){
+      document.querySelectorAll('#app .drop-antes,#app .drop-depois,#app .drop-fim,#app .arrastando').forEach(function(n){
+        n.classList.remove('drop-antes', 'drop-depois', 'drop-fim', 'arrastando');
+      });
+    }
+    function alvoDrop(e){
+      var item = e.target.closest && e.target.closest('#app .item[data-ip]');
+      if (item) {
+        var r = item.getBoundingClientRect();
+        return { el: item, gp: item.dataset.ip.replace(/\.itens\.\d+$/, ''), idx: +item.dataset.ip.split('.').pop() + (e.clientY > r.top + r.height / 2 ? 1 : 0), depois: e.clientY > r.top + r.height / 2 };
+      }
+      var grupo = e.target.closest && e.target.closest('#app .grupo[data-gp]');
+      if (grupo) return { el: grupo, gp: grupo.dataset.gp, idx: null, grupo: true };
+      return null;
+    }
+    document.addEventListener('dragstart', function(e){
+      var h = e.target.closest && e.target.closest('[data-arrastar]');
+      if (!h) return;
+      arrastado = h.dataset.arrastar;
+      try { e.dataTransfer.setData('text/plain', arrastado); e.dataTransfer.effectAllowed = 'move'; } catch(x){}
+      var art = h.closest('.item'); if (art) { art.classList.add('arrastando'); try { e.dataTransfer.setDragImage(art, 20, 20); } catch(x){} }
+    });
+    document.addEventListener('dragover', function(e){
+      if (!arrastado) return;
+      var a = alvoDrop(e);
+      if (!a) return;
+      e.preventDefault();
+      limparMarcas();
+      var origem = document.querySelector('#app .item[data-ip="' + arrastado + '"]'); if (origem) origem.classList.add('arrastando');
+      a.el.classList.add(a.grupo ? 'drop-fim' : (a.depois ? 'drop-depois' : 'drop-antes'));
+    });
+    document.addEventListener('drop', function(e){
+      if (!arrastado) return;
+      var a = alvoDrop(e), origem = arrastado;
+      e.preventDefault();
+      arrastado = null; limparMarcas();
+      if (!a || (a.el.dataset && a.el.dataset.ip === origem)) return;
+      moverItem(origem, a.gp, a.idx);
+    });
+    document.addEventListener('dragend', function(){ arrastado = null; limparMarcas(); });
+
     document.getElementById('sel-layout').addEventListener('change', function(e){
       data.config.layout = e.target.value; salvar(); rerender();
       var lp = document.getElementById('sel-layout-p'); if (lp) lp.value = e.target.value;
