@@ -337,6 +337,9 @@
   .f-grupo-titulo{font-family:var(--display);font-weight:400;font-size:calc(15pt * var(--esc) * var(--fi));color:var(--p-accent);letter-spacing:.09em;text-transform:uppercase;line-height:1.15;padding-bottom:1.3mm;border-bottom:1.5px solid var(--p-accent);margin-bottom:1mm}
   .f-grupo-nota{font-size:calc(9.5pt * var(--esc) * var(--fi));color:var(--p-muted);margin:0 0 1mm}
   .f-lista-2 .f-itens{columns:2;column-gap:10mm}
+  /* seção sem linhas entre os produtos: itens mais próximos */
+  .f-sem-linhas .f-item{border-bottom:0;padding:calc(1.5mm * var(--fi)) 0}
+  .f-sem-linhas .f-grupos{gap:5mm}
   .f-item{display:flex;gap:2.5mm;align-items:center;padding:calc(2.4mm * var(--fi)) 0;break-inside:avoid;border-bottom:1px solid var(--p-line)}
   .f-cont-tag{font-family:var(--body);font-size:7.5pt;letter-spacing:.18em;text-transform:uppercase;color:var(--p-muted);vertical-align:middle;margin-left:2mm}
   .f-head-cont{margin-bottom:5mm}
@@ -1031,7 +1034,8 @@
       "impressao": {
         "letra": "extra",
         "foto": "nenhuma",
-        "umaFolha": "sim"
+        "umaFolha": "sim",
+        "semLinhas": "sim"
       }
     },
     {
@@ -2087,6 +2091,8 @@
         (ctx.primeira ? '' : '<label>Início <select data-sec="' + i + '" data-campo="juntar">' + opcoes(JUNTAR, cfg.juntar || '') + '</select></label>') +
         '<label title="Diminui a letra só o necessário para a seção inteira caber numa folha">Caber em 1 folha <select data-sec="' + i + '" data-campo="umaFolha">' +
           '<option value="">Não</option><option value="sim"' + (cfg.umaFolha === 'sim' ? ' selected' : '') + '>Sim</option></select></label>' +
+        '<label title="Tira as linhas que separam os produtos e aproxima os itens (sobra espaço para letra maior)">Linhas entre produtos <select data-sec="' + i + '" data-campo="semLinhas">' +
+          '<option value="">Sim</option><option value="sim"' + (cfg.semLinhas === 'sim' ? ' selected' : '') + '>Não (mais compacto)</option></select></label>' +
         (ctx.auto && ctx.auto[i] ? '<span class="pg-nota">letra reduzida para ' + Math.round(ctx.auto[i] / baseFi(i) * 100) + '% para caber na folha</span>' : '') +
         '<button type="button" class="mini" data-acao="foto-up" data-path="' + p + '.foto">' + (temFoto ? 'Trocar foto' : 'Enviar foto') + '</button>' +
         (temFoto ? '<button type="button" class="mini" data-acao="foto-ajustar" data-path="' + p + '.foto">Zoom / enquadrar</button>' : '') +
@@ -2094,7 +2100,7 @@
     }
     var barraSec = editando ? cont.lastElementChild : null;
     function folhaSecao(){
-      var inn = novaFolha(cont);
+      var inn = novaFolha(cont, cfg.semLinhas === 'sim' ? 'f-sem-linhas' : '');
       if (fi) inn.parentNode.style.setProperty('--fi', fi);
       if (posFoto === 'fundo' && temFoto) inn.parentNode.insertAdjacentHTML('afterbegin', pSlot(p + '.foto', 'f-foto-fundo', ''));
       return inn;
@@ -2245,7 +2251,7 @@
   // para a paginação ser a mesma do papel em qualquer tela.
   var medindo = false, imprimindo = false;
   function renderPrint(){
-    var auto = {};
+    var auto = {}, falhou = {};   // falhou[k] = último tamanho que NÃO coube
     medindo = true;
     for (var volta = 0; volta < 20; volta++) {
       var sobras = montarFolhas(auto), mudou = false;
@@ -2253,10 +2259,28 @@
         par.forEach(function(k){
           if (k == null) return;
           var atual = auto[k] || baseFi(k);
-          if (atual > 0.7 + 1e-9) { auto[k] = Math.max(0.7, Math.round((atual - 0.05) * 100) / 100); mudou = true; }
+          if (atual > 0.7 + 1e-9) { falhou[k] = atual; auto[k] = Math.max(0.7, Math.round((atual - 0.05) * 100) / 100); mudou = true; }
         });
       });
       if (!mudou) break;
+    }
+    // refinamento: tenta um tamanho entre o que coube e o que não coube (letra o maior possível)
+    for (var r = 0; r < 2; r++) {
+      var tentou = {}, algum = false;
+      Object.keys(falhou).forEach(function(k){
+        if (!auto[k] || falhou[k] - auto[k] < 0.015) return;
+        tentou[k] = auto[k];
+        auto[k] = Math.round((auto[k] + falhou[k]) / 2 * 1000) / 1000;
+        algum = true;
+      });
+      if (!algum) break;
+      var sob = montarFolhas(auto), ruins = {};
+      sob.forEach(function(par){ par.forEach(function(k){ if (k != null) ruins[k] = true; }); });
+      var voltar = false;
+      Object.keys(tentou).forEach(function(k){
+        if (ruins[k]) { falhou[k] = auto[k]; auto[k] = tentou[k]; voltar = true; }
+      });
+      if (voltar) montarFolhas(auto);
     }
     medindo = false;
     ajustarZoom();
