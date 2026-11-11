@@ -19,7 +19,7 @@
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,600;1,400&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0c0c0a;
@@ -203,6 +203,8 @@
   .modo-edicao body,body.modo-edicao{padding-bottom:150px}
   body.modo-edicao .ed{outline:1px dashed rgba(211,220,124,.35);outline-offset:2px;border-radius:3px;cursor:text;min-width:1.5em;display:inline-block}
   body.modo-edicao p.ed,body.modo-edicao h1.ed,body.modo-edicao h2.ed,body.modo-edicao h3.ed{display:block}
+  /* nas folhas de impressão, os campos editáveis ocupam o mesmo espaço que na versão do cliente */
+  body.modo-edicao #print .ed{display:revert;min-width:0}
   body.modo-edicao .ed:hover{outline-color:rgba(211,220,124,.7)}
   body.modo-edicao .ed:focus{outline:2px solid var(--accent);background:rgba(211,220,124,.07)}
   body.modo-edicao .ed:empty::before{content:attr(data-ph);color:rgba(244,240,212,.3);font-style:italic;font-weight:400}
@@ -265,6 +267,7 @@
   .barra-info strong{display:block;color:var(--cream);font-size:.92rem}
   .barra-info .pendente{color:var(--accent)}
   .barra label{display:inline-flex;gap:6px;align-items:center;font-size:.82rem;color:var(--text);cursor:pointer}
+  .barra select{font:inherit;font-size:.82rem;background:var(--surface-2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
   .btn{border:1px solid var(--line);background:var(--surface-2);border-radius:9px;padding:8px 13px;font-size:.86rem;font-weight:700;cursor:pointer}
   .btn:hover{border-color:var(--accent)}
   .btn.primario{background:var(--accent);color:var(--bg);border-color:var(--accent)}
@@ -454,6 +457,95 @@
   /* foto como fundo transparente da página inteira */
   .f-foto-fundo{position:absolute;inset:0;z-index:1;margin:0;border-radius:0;opacity:.22;pointer-events:none}
   .f-foto-fundo .f-quadro{-webkit-mask-image:radial-gradient(ellipse 80% 72% at 50% 55%,#000 35%,transparent 100%);mask-image:radial-gradient(ellipse 80% 72% at 50% 55%,#000 35%,transparent 100%)}
+
+  /* =========================================================
+     SELOS DOS ITENS (Novo, Sugestão do chef, Mais pedido, Vegetariano, Picante)
+     ========================================================= */
+  .selo-item{display:inline-block;margin-left:7px;font:700 .62rem/1 var(--body);letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 7px 3px;border-radius:999px;vertical-align:.18em;white-space:nowrap;background:var(--accent);color:var(--bg)}
+  .s-chef{background:var(--cream);color:var(--bg)}
+  .s-mais-pedido{background:#f2b33d;color:#1a1204}
+  .s-vegetariano{background:#79b86b;color:#0f1a0c}
+  .s-picante{background:#e2603f;color:#fff}
+  body.modo-edicao .selo-item[data-acao]{cursor:pointer}
+  body.modo-edicao .selo-item[data-acao]:hover{text-decoration:line-through}
+  .item-ctrl select.mini{appearance:auto}
+  .f-selo-item{display:inline-block;margin-left:1.6mm;font:700 calc(5.6pt * var(--fi)) /1 var(--body);letter-spacing:.06em;text-transform:uppercase;
+    padding:.7mm 1.5mm .5mm;border-radius:99px;vertical-align:.2em;white-space:nowrap;background:var(--p-accent);color:var(--p-bg)}
+  .f-selo-item.s-chef{background:var(--p-cream);color:var(--p-bg)}
+  .f-selo-item.s-mais-pedido{background:#f2b33d;color:#1a1204}
+  .f-selo-item.s-vegetariano{background:#79b86b;color:#0f1a0c}
+  .f-selo-item.s-picante{background:#e2603f;color:#fff}
+  .secao-num,.f-num{display:none}
+  .hero-logo{display:none}
+
+  /* =========================================================
+     LAYOUT "PAINEL DE EMBARQUE" (versão 2)
+     ========================================================= */
+  body.lay-painel{--bg:#0b0e12;--surface:#121821;--surface-2:#19212c;--cream:#f4f0d4;--text:#e8e6dc;--muted:#9aa3ad;
+    --line:rgba(242,179,61,.16);--accent:#f2b33d;--olive:#24344a;--olive-2:#f2b33d;
+    --display:'Bebas Neue',Impact,sans-serif;--body:'Barlow',system-ui,sans-serif;font-family:var(--body)}
+  body.lay-painel .hero{background:radial-gradient(120% 90% at 50% 0%,#16202c 0%,var(--bg) 70%);padding-bottom:72px}
+  body.lay-painel .hero::before{display:none}
+  body.lay-painel .hero::after{top:auto;bottom:22px;left:0;right:0;width:auto;height:6px;aspect-ratio:auto;opacity:.85;
+    background:repeating-linear-gradient(90deg,var(--accent) 0 12px,transparent 12px 40px)}
+  body.lay-painel .hero-logo{display:block;width:min(340px,78%);margin:0 auto 6px}
+  body.lay-painel .hero-titulo{letter-spacing:.08em;font-size:clamp(3rem,13vw,5.6rem)}
+  body.lay-painel .marca{color:var(--accent)}
+  body.lay-painel .nav a.ativo{background:var(--accent);color:#14100a}
+  body.lay-painel .secao-head{display:grid;grid-template-columns:auto 1fr;column-gap:16px;align-items:center;padding-bottom:16px;border-bottom:2px dashed var(--line)}
+  body.lay-painel .secao-head > *:not(.secao-num){grid-column:2;justify-self:start}
+  body.lay-painel .secao-num{display:flex;grid-row:1 / span 6;align-self:start;width:74px;height:74px;border-radius:12px;background:var(--accent);color:#14100a;
+    font:400 2.9rem/1 var(--display);align-items:center;justify-content:center;letter-spacing:.02em}
+  body.lay-painel .secao-titulo{letter-spacing:.06em;font-size:clamp(2.4rem,9vw,3.4rem)}
+  body.lay-painel .secao-horario{border-color:rgba(242,179,61,.4)}
+  body.lay-painel .grupo-titulo{letter-spacing:.08em;font-size:1.7rem}
+  body.lay-painel .grupo-titulo::before{content:"";display:inline-block;width:9px;height:9px;background:var(--accent);transform:rotate(45deg);margin:0 12px 0 2px;vertical-align:.3em}
+  body.lay-painel .item-nome{font-family:'Barlow Condensed',var(--body);font-weight:600;text-transform:uppercase;letter-spacing:.035em;font-size:1.16rem}
+  body.lay-painel .leader{border-bottom:1px dashed rgba(242,179,61,.28);transform:translateY(-5px)}
+  body.lay-painel .preco{font-style:normal;font-family:'Barlow Condensed',var(--body);font-weight:700;border:1.5px solid var(--accent);border-radius:999px;padding:1px 10px 0;font-size:1.05rem}
+  body.lay-painel .grupo-promo{background:linear-gradient(140deg,#24344a 0%,#182436 100%);border:2px dashed rgba(242,179,61,.45)}
+  body.lay-painel .grupo-promo .grupo-titulo{color:var(--accent)}
+  body.lay-painel .grupo-promo .preco{color:var(--accent)}
+  /* cartões com foto: foto em cima, como um cartão de embarque */
+  body.lay-painel .com-foto .item{border-radius:16px}
+  body.lay-painel .com-foto .item.com-fundo{flex-direction:column;align-items:stretch;padding:0;min-height:0;overflow:hidden}
+  body.lay-painel .foto.item-fundo{position:relative;inset:auto;width:100%;aspect-ratio:16/10;opacity:1;order:-1;border-bottom:2px dashed rgba(242,179,61,.35)}
+  body.lay-painel .foto.item-fundo .foto-quadro{-webkit-mask-image:none;mask-image:none}
+  body.lay-painel .item.com-fundo > :not(.item-fundo){padding:0 14px}
+  body.lay-painel .item.com-fundo > .item-corpo{padding-top:12px;padding-bottom:12px}
+  body.lay-painel .item.com-fundo > .item-ctrl{padding-bottom:12px}
+  body.lay-painel .item.com-fundo .item-nome,body.lay-painel .item.com-fundo .preco,body.lay-painel .item.com-fundo .item-desc{text-shadow:none}
+  body.lay-painel .item.com-fundo .item-desc{color:var(--muted)}
+  body.lay-painel .destaque{background:linear-gradient(140deg,#24344a 0%,#141d29 100%);border:2px dashed rgba(242,179,61,.4)}
+  body.lay-painel .selo{background:var(--accent);color:#14100a}
+
+  /* impressão no layout painel */
+  .folhas.painel{--p-bg:#0b0e12;--p-text:#e8e6dc;--p-cream:#f4f0d4;--p-muted:#9aa3ad;--p-accent:#f2b33d;--p-line:rgba(242,179,61,.18);
+    --p-line2:rgba(242,179,61,.38);--p-surface:#121821;--p-olive:#24344a;--p-olive-text:#f4f0d4;--p-tri:#f2b33d;--p-dest:#1b2738;--p-dest-text:#f4f0d4}
+  .folhas.painel.claro{--p-bg:#ffffff;--p-text:#22262b;--p-cream:#111418;--p-muted:#5d6670;--p-accent:#a86400;--p-line:rgba(0,0,0,.14);
+    --p-line2:rgba(168,100,0,.45);--p-surface:#f4f2ec;--p-olive:#1f3047;--p-olive-text:#ffffff;--p-tri:#e2a43a;--p-dest:#eef1f5;--p-dest-text:#14202f}
+  .painel .folha{font-family:'Barlow',var(--body)}
+  .painel .f-titulo,.painel .f-grupo-titulo,.painel .f-dest-nome,.painel .capa-titulo{font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:.06em}
+  .painel .f-grupo-titulo::before{content:"";display:inline-block;width:2.2mm;height:2.2mm;background:var(--p-accent);transform:rotate(45deg);margin:0 3mm 0 .5mm;vertical-align:.25em}
+  .painel .f-nome{font-family:'Barlow Condensed',var(--body);text-transform:uppercase;letter-spacing:.035em;font-weight:600}
+  .painel .f-leader{border-bottom-style:dashed;border-bottom-width:1px}
+  .painel .folha .preco{font-style:normal;font-family:'Barlow Condensed',var(--body);border:1px solid var(--p-accent);border-radius:99px;padding:0 2.2mm}
+  .painel .f-promo{border:1.5px dashed rgba(242,179,61,.55)}
+  .painel .f-promo .f-grupo-titulo{color:var(--p-accent)}
+  .painel .f-promo .preco{color:var(--p-accent)}
+  .painel .f-head{display:grid;grid-template-columns:auto 1fr;column-gap:5mm;align-items:center}
+  .painel .f-head > *:not(.f-num){grid-column:2;justify-self:start}
+  .painel .f-num{display:flex;grid-row:1 / span 5;align-self:start;width:17mm;height:17mm;border-radius:3mm;background:var(--p-accent);color:var(--p-bg);
+    font:400 28pt/1 'Bebas Neue',Impact,sans-serif;align-items:center;justify-content:center}
+  .painel .f-head-cont .f-num,.painel .f-head-junto .f-num{width:12mm;height:12mm;font-size:19pt}
+  .painel .folha:not(.f-capa)::before{content:"";position:absolute;left:0;right:0;top:0;height:2.6mm;z-index:3;opacity:.9;
+    background:repeating-linear-gradient(90deg,var(--p-accent) 0 9mm,transparent 9mm 15mm)}
+  /* cartões com foto na impressão: miniatura à esquerda, sem esfumado */
+  .painel .f-card .f-fundo{position:relative;inset:auto;width:calc(19mm * var(--fi));height:calc(19mm * var(--fi));flex:none;order:-1;border-radius:2mm;opacity:1}
+  .painel .f-card .f-fundo .f-quadro{-webkit-mask-image:none;mask-image:none}
+  .painel .f-card.com-fundo{min-height:0;align-items:center}
+  .painel .f-card.com-fundo .f-nome,.painel .f-card.com-fundo .preco,.painel .f-card.com-fundo .f-desc{text-shadow:none}
 
   @page{size:A4 portrait;margin:0}
   @media print{
@@ -1384,7 +1476,8 @@
     });
   }
   var BASE = hash(FONTE);
-  var LS_KEY = 'hangar41-cardapio-rascunho';
+  // cada versão do cardápio (clássico / painel) guarda suas alterações separadamente no navegador
+  var LS_KEY = 'hangar41-cardapio-rascunho' + ((ORIGINAL.config || {}).layout === 'painel' ? '-v2' : '');
   var editando = /[?&]editar\b/.test(location.search) || location.hash === '#editar';
   var data = clonar(ORIGINAL);
   if (editando) {
@@ -1515,6 +1608,8 @@
                  '<button type="button" class="mini" data-acao="foto-up" data-path="' + ip + '.foto">' + (temFoto ? 'Trocar foto' : 'Enviar foto') + '</button>' +
                  '<button type="button" class="mini" data-acao="foto-link" data-path="' + ip + '.foto">Link da foto</button>' +
                  (temFoto ? '<button type="button" class="mini perigo" data-acao="foto-del" data-path="' + ip + '.foto">Remover foto</button>' : '') : '') +
+      '<select class="mini" data-selo-add="' + ip + '" aria-label="Adicionar selo"><option value="">+ Selo</option>' +
+        Object.keys(SELOS).map(function(k){ return '<option value="' + k + '">' + SELOS[k] + '</option>'; }).join('') + '</select>' +
       '<button type="button" class="mini perigo" data-acao="del" data-path="' + ip + '">Excluir</button>' +
       '</div>';
   }
@@ -1525,7 +1620,7 @@
     var html = '<article class="item' + (it.oculto ? ' is-oculto' : '') + (fundo ? ' com-fundo' : '') + '">';
     if (fundo) html += '<figure class="foto item-fundo tem" data-path="' + ip + '.foto" aria-hidden="true"><span class="foto-quadro">' +
       '<img src="' + esc(it.foto) + '" alt="" loading="lazy"' + estiloImg(ip + '.foto') + '></span></figure>';
-    html += '<div class="item-corpo"><div class="item-linha">' + ed(ip + '.nome', 'h4', 'item-nome', 'texto', 'Nome do item');
+    html += '<div class="item-corpo"><div class="item-linha">' + ed(ip + '.nome', 'h4', 'item-nome', 'texto', 'Nome do item') + selosHTML(it, ip, false);
     if (!multi) html += '<span class="leader" aria-hidden="true"></span>' + preco(ip + '.preco');
     html += '</div>' + opt(ip + '.desc', 'p', 'item-desc', 'multi', 'Descrição (opcional)') + '</div>';
     if (multi) {
@@ -1606,6 +1701,7 @@
     var hor = getPath(p + '.horario');
     return '<section class="secao' + (s.oculto ? ' is-oculto' : '') + '" id="' + esc(s.id) + '">' +
       '<header class="secao-head">' +
+        '<span class="secao-num" aria-hidden="true">' + numeroEtapa(i) + '</span>' +
         (s.oculto ? '<span class="etapa">Seção oculta</span>' : (tematico() ? '<span class="etapa">Etapa ' + numeroEtapa(i) + '</span>' : '')) +
         (tematico()
           ? ed(p + '.titulo', 'h2', 'secao-titulo', 'texto', 'Título') + opt(p + '.subtitulo', 'p', 'secao-sub', 'texto', 'Subtítulo (opcional)')
@@ -1628,11 +1724,22 @@
   function waLink(){ var d = String(data.info.whatsapp || '').replace(/\D/g, ''); return d ? 'https://wa.me/55' + d : ''; }
   function mapaLink(){ return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((data.info.endereco || '') + ', ' + (data.info.cidade || '')); }
 
+  var SELOS = { novo: 'Novo', chef: 'Sugestão do chef', 'mais-pedido': 'Mais pedido', vegetariano: 'Vegetariano', picante: 'Picante' };
+  function selosHTML(it, ip, print){
+    return (it.selos || []).filter(function(k){ return SELOS[k]; }).map(function(k){
+      return print ? '<span class="f-selo-item s-' + k + '">' + SELOS[k] + '</span>'
+        : '<span class="selo-item s-' + k + '"' + (editando ? ' data-acao="selo-del" data-path="' + ip + '" data-selo="' + k + '" title="Clique para tirar o selo"' : '') + '>' + SELOS[k] + '</span>';
+    }).join('');
+  }
+  function painel(){ return data.config.layout === 'painel'; }
+
   function render(){
+    document.body.classList.toggle('lay-painel', painel());
     var info = data.info;
     var wa = waLink();
     var html = '';
     html += '<header class="hero"><div class="hero-inner">' +
+      (info.logo ? '<img class="hero-logo" src="' + esc(info.logo) + '" alt="' + esc(info.marca) + '">' : '') +
       '<p class="marca">' + ed('info.marca', 'span', '', 'texto', 'Nome') + '<span class="sep">·</span>' + ed('info.complemento', 'span', '', 'texto', 'Complemento') + '</p>' +
       ed('info.titulo', 'h1', 'hero-titulo', 'texto', 'Título') +
       opt('info.slogan', 'p', 'hero-slogan', 'multi', 'Frase de apresentação') +
@@ -1715,7 +1822,7 @@
     var card = !!g.comFoto, foto = card && it.foto;
     var h = '<div class="f-item' + (card ? ' f-card' : '') + (foto ? ' com-fundo' : '') + '">';
     if (foto) h += '<span class="f-fundo" aria-hidden="true"><span class="f-quadro"><img src="' + esc(it.foto) + '" alt=""' + estiloImg(ip + '.foto') + '></span></span>';
-    h += '<div class="f-corpo"><div class="f-linha">' + ed(ip + '.nome', 'span', 'f-nome');
+    h += '<div class="f-corpo"><div class="f-linha">' + ed(ip + '.nome', 'span', 'f-nome') + selosHTML(it, ip, true);
     if (!multi) h += '<span class="f-leader"></span>' + preco(ip + '.preco');
     h += '</div>' + optP(ip + '.desc', 'div', 'f-desc', 'multi') + '</div>';
     if (multi) h += '<div class="f-precos">' + g.colunas.map(function(c, ci){ return '<span class="f-col">' + preco(ip + '.precos.' + ci, true) + '</span>'; }).join('') + '</div>';
@@ -1817,7 +1924,7 @@
       var folhas = cont.querySelectorAll('.folha'), ultima = folhas[folhas.length - 1];
       if (ultima && !ultima.classList.contains('f-fixa')) {
         var ui = ultima.querySelector('.folha-in');
-        var h = addHTML(ui, '<header class="f-head f-head-junto">' + cabecalho + '</header>');
+        var h = addHTML(ui, '<header class="f-head f-head-junto"><span class="f-num">' + etapa + '</span>' + cabecalho + '</header>');
         ultima.classList.add('f-junta');
         if (cabe(ui) && espacoLivre(ui) >= 120) { inn = ui; juntou = true; }
         else { h.remove(); ultima.classList.remove('f-junta'); ctx.transbordou.push([ctx.ultimaSec, i]); }
@@ -1829,14 +1936,14 @@
         var topo = pSlot(p + '.foto', 'f-foto-topo', s.titulo);
         if (topo) { inn.parentNode.insertAdjacentHTML('afterbegin', topo); inn.classList.add('com-foto-topo'); }
       }
-      addHTML(inn, '<header class="f-head">' + cabecalho + '</header>');
+      addHTML(inn, '<header class="f-head"><span class="f-num">' + etapa + '</span>' + cabecalho + '</header>');
     }
     var area = addHTML(inn, '<div class="f-grupos"></div>');
 
     function continuar(){
       if (juntou) { ctx.transbordou.push([ctx.ultimaSec, i]); juntou = false; }
       inn = folhaSecao();
-      addHTML(inn, '<header class="f-head f-head-cont"><span class="f-etapa">' + (tematico() ? 'Etapa ' + etapa + ' · ' : '') + 'continuação</span>' +
+      addHTML(inn, '<header class="f-head f-head-cont"><span class="f-num">' + etapa + '</span><span class="f-etapa">' + (tematico() ? 'Etapa ' + etapa + ' · ' : '') + 'continuação</span>' +
         '<h2 class="f-titulo f-titulo-cont">' + esc(nomeSecao(s)) + '</h2></header>');
       area = addHTML(inn, '<div class="f-grupos"></div>');
     }
@@ -1946,8 +2053,12 @@
   // Monta as folhas; se uma seção marcada para "juntar" não couber na folha da anterior,
   // diminui a letra das duas aos poucos (até 70%) e monta de novo.
   function baseFi(k){ var c = data.secoes[k].impressao || {}; return LETRAS[c.letra] || letraImpressao(); }
+  // medindo = true: as folhas são montadas e medidas no tamanho real (sem o zoom da tela),
+  // para a paginação ser a mesma do papel em qualquer tela.
+  var medindo = false, imprimindo = false;
   function renderPrint(){
     var auto = {};
+    medindo = true;
     for (var volta = 0; volta < 12; volta++) {
       var sobras = montarFolhas(auto), mudou = false;
       sobras.forEach(function(par){
@@ -1959,11 +2070,13 @@
       });
       if (!mudou) break;
     }
+    medindo = false;
+    ajustarZoom();
   }
   function montarFolhas(auto){
     var info = data.info;
     var alvo = document.getElementById('print');
-    alvo.innerHTML = '<div class="folhas' + (data.config.temaImpressao === 'claro' ? ' claro' : '') + '" style="--fi:' + letraImpressao() + '"></div>';
+    alvo.innerHTML = '<div class="folhas' + (data.config.temaImpressao === 'claro' ? ' claro' : '') + (painel() ? ' painel' : '') + '" style="--fi:' + letraImpressao() + '"></div>';
     var cont = alvo.firstElementChild;
     ajustarZoom();
 
@@ -2033,7 +2146,7 @@
     var fs = document.querySelector('#print .folhas');
     if (!fs) return;
     var larguraA4 = 210 * 96 / 25.4;
-    fs.style.zoom = document.body.classList.contains('modo-impressao') ? String(Math.min(1, (window.innerWidth - 20) / larguraA4)) : '';
+    fs.style.zoom = (document.body.classList.contains('modo-impressao') && !medindo && !imprimindo) ? String(Math.min(1, (window.innerWidth - 20) / larguraA4)) : '';
   }
   function modoImpressao(on){
     document.body.classList.toggle('modo-impressao', on);
@@ -2049,12 +2162,21 @@
     bar.innerHTML = '<strong>Versão para impressão · <span id="print-total">folhas A4</span></strong>' +
       '<label>Fundo <select id="sel-tema"><option value="escuro">Escuro (como o atual)</option><option value="claro">Claro (economiza tinta)</option></select></label>' +
       '<label>Letra dos itens <select id="sel-letra">' + opcoes(NOMES_LETRA, '') + '</select></label>' +
+      '<label>Layout <select id="sel-layout-p"><option value="classico">Clássico</option><option value="painel">Painel de embarque</option></select></label>' +
       '<button type="button" class="btn primario" id="btn-imprimir">Imprimir / Salvar PDF</button>' +
       '<button type="button" class="btn" id="btn-voltar">Voltar ao cardápio digital</button>' +
       '<span class="print-dica">Na janela de impressão: papel A4, margens “Nenhuma”, escala 100% e marque “Gráficos de plano de fundo”.</span>';
     document.body.insertBefore(bar, document.body.firstChild);
     var sel = document.getElementById('sel-tema');
     sel.value = data.config.temaImpressao === 'claro' ? 'claro' : 'escuro';
+    var selLay = document.getElementById('sel-layout-p');
+    selLay.value = painel() ? 'painel' : 'classico';
+    selLay.addEventListener('change', function(){
+      data.config.layout = selLay.value;
+      if (editando) salvar();
+      var lb = document.getElementById('sel-layout'); if (lb) lb.value = selLay.value;
+      render(); renderPrint();
+    });
     var selL = document.getElementById('sel-letra');
     selL.value = LETRAS[data.config.letraImpressao] ? data.config.letraImpressao : 'grande';
     selL.addEventListener('change', function(){
@@ -2070,7 +2192,8 @@
     document.getElementById('btn-imprimir').addEventListener('click', function(){ window.print(); });
     document.getElementById('btn-voltar').addEventListener('click', function(){ modoImpressao(false); });
     window.addEventListener('resize', ajustarZoom);
-    window.addEventListener('beforeprint', renderPrint);
+    window.addEventListener('beforeprint', function(){ imprimindo = true; renderPrint(); });
+    window.addEventListener('afterprint', function(){ imprimindo = false; ajustarZoom(); });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(renderPrint);
     window.addEventListener('load', renderPrint);
   }
@@ -2210,6 +2333,12 @@
         if (url == null) return;
         if (url.trim() !== getPath(path)) limparAjuste(path);
         setPath(path, url.trim()); salvar(); rerender();
+        break;
+      case 'selo-del':
+        var itS = getPath(path), selo = el && el.dataset ? el.dataset.selo : '';
+        itS.selos = (itS.selos || []).filter(function(k){ return k !== selo; });
+        if (!itS.selos.length) delete itS.selos;
+        salvar(); rerender();
         break;
       case 'foto-del':
         if (!confirm('Remover esta foto?')) return;
@@ -2364,6 +2493,7 @@
       '<div class="barra-info"><strong>Modo edição</strong><span id="status"></span></div>' +
       '<label><input type="checkbox" id="opt-vazios"' + (data.config.mostrarEspacosFoto ? ' checked' : '') + '> Mostrar espaços de foto vazios aos clientes</label>' +
       '<label title="Primeiro Voo, Altitudes Geladas, Combustível, Decolagem, Voo, Voo Duplo..."><input type="checkbox" id="opt-tematicos"' + (tematico() ? ' checked' : '') + '> Nomes temáticos das seções</label>' +
+      '<label>Layout <select id="sel-layout"><option value="classico"' + (painel() ? '' : ' selected') + '>Clássico</option><option value="painel"' + (painel() ? ' selected' : '') + '>Painel de embarque</option></select></label>' +
       '<button type="button" class="btn" id="btn-preview">Pré-visualizar</button>' +
       '<button type="button" class="btn" id="btn-versao-impressa">Versão para impressão</button>' +
       '<button type="button" class="btn primario" id="btn-baixar">Baixar cardápio atualizado</button>' +
@@ -2441,6 +2571,14 @@
         window.scrollTo({ top: yl, behavior: 'instant' });
         return;
       }
+      if (el.dataset && el.dataset.seloAdd) {
+        var itA = getPath(el.dataset.seloAdd);
+        if (el.value && SELOS[el.value]) {
+          itA.selos = (itA.selos || []).filter(function(k){ return k !== el.value; }).concat([el.value]);
+          salvar(); rerender();
+        }
+        return;
+      }
       if (el.dataset && el.dataset.campoGrupo && el.dataset.grupo) {
         var gr = getPath(el.dataset.grupo);
         if (el.value) gr[el.dataset.campoGrupo] = el.value; else delete gr[el.dataset.campoGrupo];
@@ -2468,6 +2606,10 @@
 
     document.getElementById('opt-vazios').addEventListener('change', function(e){
       data.config.mostrarEspacosFoto = e.target.checked; salvar(); rerender();
+    });
+    document.getElementById('sel-layout').addEventListener('change', function(e){
+      data.config.layout = e.target.value; salvar(); rerender();
+      var lp = document.getElementById('sel-layout-p'); if (lp) lp.value = e.target.value;
     });
     document.getElementById('opt-tematicos').addEventListener('change', function(e){
       data.config.titulosTematicos = e.target.checked; salvar(); rerender();
